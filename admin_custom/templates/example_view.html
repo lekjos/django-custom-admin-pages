@@ -1,0 +1,14 @@
+{% extends 'admin/base_site.html' %}
+{% load static %}
+{% block responsive %}
+{{block.super}}
+<!-- add additional scripts here -->
+{% endblock responsive %}
+
+{% block title %}
+{{title}}
+{% endblock %}
+{% block content %}
+<h1>This is an example view</h1>
+<p>... for exampling use only.</p>
+{% endblock %} 
