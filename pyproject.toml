@@ -1,0 +1,26 @@
+[tool.poetry]
+name = "django-custom-admin-pages"
+version = "0.1.0"
+description = "A Django app that allows you to register class-based views to appear in Django admin."
+authors = ["lekjos <leif@leifkjos.com>"]
+license = "LICENSE"
+readme = "README.md"
+packages = [{include = "django_custom_admin_pages"}]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+Django = "^3.2"
+
+[tool.poetry.group.dev.dependencies]
+black = "*"
+coverage = "*"
+pytest = "*"
+pylint = "*"
+pytest-cov = "*"
+pylint-django = "*"
+safety = "*"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
