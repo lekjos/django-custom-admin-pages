@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.urls import path
 
-from admin_custom import views
+from . import views
 
 # Custom admin site urls go here:
 urlpatterns = [

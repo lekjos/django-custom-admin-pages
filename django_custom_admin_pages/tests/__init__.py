@@ -19,7 +19,9 @@ from . import urls
 User: AbstractUser = get_user_model()
 
 ADMIN_BASE_URL = reverse("admin:index")
-ADMIN_CUSTOM_URL = f"/{ADMIN_BASE_URL}/{settings.DEFAULT_CUSTOM_ADMIN_PATH}/"
+django_custom_admin_pages_URL = (
+    f"/{ADMIN_BASE_URL}/{settings.DEFAULT_CUSTOM_ADMIN_PATH}/"
+)
 
 
 def reload_urlconf(urlconf=None):
@@ -125,27 +127,33 @@ def test_admin_index_newly_registered_view(user):
     assert user.is_active
     assert user.is_superuser
 
-    r = c.get(f"{ADMIN_CUSTOM_URL}/test-route/")
+    r = c.get(f"{django_custom_admin_pages_URL}/test-route/")
     assert r.status_code == 200
 
-    admin_custom_dict: dict = list(
-        filter(lambda x: x["app_label"] == "admin_custom", r.context["app_list"])
+    django_custom_admin_pages_dict: dict = list(
+        filter(
+            lambda x: x["app_label"] == "django_custom_admin_pages",
+            r.context["app_list"],
+        )
     )[0]
     test_view: dict = list(
         filter(
-            lambda x: x["admin_url"] == f"/{ADMIN_CUSTOM_URL}/test-route/",
-            admin_custom_dict["models"],
+            lambda x: x["admin_url"] == f"/{django_custom_admin_pages_URL}/test-route/",
+            django_custom_admin_pages_dict["models"],
         )
     )[0]
 
-    assert admin_custom_dict["app_url"] == ADMIN_CUSTOM_URL
-    assert admin_custom_dict["name"] == "Custom Admin Pages"
-    assert admin_custom_dict["app_label"] == settings.CUSTOM_ADMIN_DEFAULT_APP_LABEL
+    assert django_custom_admin_pages_dict["app_url"] == django_custom_admin_pages_URL
+    assert django_custom_admin_pages_dict["name"] == "Custom Admin Pages"
+    assert (
+        django_custom_admin_pages_dict["app_label"]
+        == settings.CUSTOM_ADMIN_DEFAULT_APP_LABEL
+    )
     assert test_view["name"] == "Test Name" == test_view["object_name"]
     assert test_view["view_only"]
 
 
-def check_admin_custom_route_names():
+def check_django_custom_admin_pages_route_names():
     admin_site = admin.site
     registered_views = admin_site._view_registry
 
@@ -155,6 +163,6 @@ def check_admin_custom_route_names():
         except NoReverseMatch:
             view_name = getattr(view, "view_name", view.__name__)
             message = f"Custom Admin View: {view_name} is routed incorrectly. Could not find route named: \
-{view.route_name}. Check that you registered a url path in admin_custom.urls and that the name matches \
+{view.route_name}. Check that you registered a url path in django_custom_admin_pages.urls and that the name matches \
 <view_class>.route_name."
             pytest.fail(message)

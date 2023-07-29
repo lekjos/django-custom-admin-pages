@@ -25,6 +25,10 @@ def get_app_label(view: View) -> str:
     return getattr(view, "app_label") or settings.CUSTOM_ADMIN_DEFAULT_APP_LABEL
 
 
+class CustomAdminConfig(AdminConfig):
+    default_site = "django_custom_admin_pages.admin.CustomAdminSite"
+
+
 class CustomAdminSite(admin.AdminSite):
     def __init__(self, *args, **kwargs):
         self._view_registry: List["AdminBaseView"] = []

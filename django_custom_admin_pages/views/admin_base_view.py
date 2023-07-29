@@ -1,14 +1,15 @@
-from typing import Optional
+from typing import TYPE_CHECKING, Optional
+
 
 from django.contrib import admin
-from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.cache import never_cache
 
-User = get_user_model()
+if TYPE_CHECKING:
+    from django.contrib.auth.models import AbstractBaseUser
 
 
 @method_decorator(never_cache, name="dispatch")
@@ -26,7 +27,7 @@ class AdminBaseView(PermissionRequiredMixin, View):
         return self.user_has_permission(self.request.user)
 
     @classmethod
-    def user_has_permission(cls, user: User) -> bool:
+    def user_has_permission(cls, user: "AbstractBaseUser") -> bool:
         """
         Used to check permission without instance.
         """

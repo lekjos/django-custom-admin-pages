@@ -7,29 +7,29 @@ This app is for custom admin views which aren't associated with a specific model
 
 To create a new custom admin view:
 
-1. Create a class-based view in `admin_custom.views` which inherets from `custom_admin.views.admin_base_view.AdminBaseView`.
-2. Create a route in `admin_custom.urls`, be sure to name it.
+1. Create a class-based view in `django_custom_admin_pages.views` which inherets from `custom_admin.views.admin_base_view.AdminBaseView`.
+2. Create a route in `django_custom_admin_pages.urls`, be sure to name it.
 3. Set the view class attribute `view_name` to whatever name you want displayed in the admin index.
 4. Set the view class attribute `route_name` equal to the route name in step 2.
-5. Set the view class attribute `app_label` to the app you'd like the admin view to display in. This must match the label in settings. Alternatively remove the attribute to make the view appear in `admin_custom` app.
+5. Set the view class attribute `app_label` to the app you'd like the admin view to display in. This must match the label in settings. Alternatively remove the attribute to make the view appear in `django_custom_admin_pages` app.
 6. Register the view like you would register a model using a custom admin funciton: `admin.site.register_view(YourView)`.
-7. Use the template `admin_custom.templates.example_view.html` as a sample for how to extend the admin templates so that your view has the admin nav.
+7. Use the template `django_custom_admin_pages.templates.example_view.html` as a sample for how to extend the admin templates so that your view has the admin nav.
 
 See `example_view.py` for more details. (It only routes in local dev)
 
 _Example:_
 
 ```python
-## in admin_custom.views.your_special_view.py
+## in django_custom_admin_pages.views.your_special_view.py
 from django.contrib import admin
 from django.views.generic import TemplateView
-from admin_custom.views.admin_base_view import AdminBaseView
+from django_custom_admin_pages.views.admin_base_view import AdminBaseView
 
 class YourSpecialView(AdminBaseView, TemplateView):
    view_name="My Super Special View"
    route_name="your_special_view"
    template_name="my_template.html"
-   app_label="marketplace" #if omitted defaults to "admin_custom". Must match app in settings
+   app_label="marketplace" #if omitted defaults to "django_custom_admin_pages". Must match app in settings
 
    # always call super() on get_context_data and use it to start your context dict.
    # the context required to render admin nav-bar is included here.
@@ -56,10 +56,10 @@ admin.site.register_view(YourViewClass)
 _Example Incorporating Models:_
 
 ```python
-## in admin_custom.views.your_special_view.py
+## in django_custom_admin_pages.views.your_special_view.py
 from django.contrib import admin
 from django.views.generic import ListView
-from admin_custom.views.admin_base_view import AdminBaseView
+from django_custom_admin_pages.views.admin_base_view import AdminBaseView
 
 class YourSpecialViewWithModels(AdminBaseView, ListView):
    # Using the Team Model as an example

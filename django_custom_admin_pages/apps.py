@@ -2,4 +2,4 @@ from django.apps import AppConfig
 
 
 class AdminCustomConfig(AppConfig):
-    name = "admin_custom"
+    name = "django_custom_admin_pages"
