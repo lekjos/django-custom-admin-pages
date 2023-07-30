@@ -19,7 +19,8 @@ class AdminBaseView(PermissionRequiredMixin, View):
     """
 
     view_name: Optional[str] = None  # Display name for view in admin menu
-    route_name: Optional[str] = None  # Must be set to match route name in url_patterns
+    route_name: Optional[str] = None  # The name of the path to be created
+    route_path_slug: Optional[str] = None  # The slug for the path to be created
     permission_required = ()
     app_label: Optional[str] = None  # Must match app label in settings or be None
 

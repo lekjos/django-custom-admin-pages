@@ -6,7 +6,7 @@
 import contextlib
 from collections import namedtuple
 from collections.abc import Iterable
-from typing import Dict, List, Type, Union
+from typing import TYPE_CHECKING, Dict, List, Type, Union
 
 from django.conf import settings
 from django.contrib import admin
@@ -15,7 +15,11 @@ from django.core.exceptions import ImproperlyConfigured
 from django.urls import include, path, reverse
 from django.views import View
 
-from .views.admin_base_view import AdminBaseView
+from django_custom_admin_pages.urls import add_view_to_conf
+
+if TYPE_CHECKING:
+    from .views.admin_base_view import AdminBaseView
+
 
 ViewRegister = namedtuple("ViewRegister", ["app_label", "view"])
 
@@ -59,10 +63,11 @@ class CustomAdminSite(admin.AdminSite):
         """
         Register the given view(s) with the admin class.
 
-        The view(s) should be class-based views inhereting from AdminBaseView.
+        The view(s) should be class-based views inheriting from AdminBaseView.
 
         If the view is already registered, raise AlreadyRegistered.
         """
+        from .views.admin_base_view import AdminBaseView
 
         if not isinstance(view_or_iterable, Iterable):
             view_or_iterable = [view_or_iterable]
@@ -71,7 +76,7 @@ class CustomAdminSite(admin.AdminSite):
             try:
                 if not issubclass(view, AdminBaseView):
                     raise ImproperlyConfigured(
-                        "Only class-based views inhereting from AdminBaseView can be registered"
+                        "Only class-based views inheriting from AdminBaseView can be registered"
                     )
             except TypeError:
                 raise ImproperlyConfigured(
@@ -103,6 +108,8 @@ class CustomAdminSite(admin.AdminSite):
 
             self._view_registry.append(view)
 
+            add_view_to_conf(view)
+
     def unregister_view(self, view_or_iterable: Union[Iterable, Type]):
         if not isinstance(view_or_iterable, Iterable):
             view_or_iterable = [view_or_iterable]
@@ -133,7 +140,7 @@ class CustomAdminSite(admin.AdminSite):
         custom_admin_views = [
             view
             for view in self._view_registry
-            if get_app_label(view) == settings.DEFAULT_CUSTOM_ADMIN_APP_LABEL
+            if get_app_label(view) == settings.CUSTOM_ADMIN_DEFAULT_APP_LABEL
         ]
 
         return [
@@ -174,8 +181,8 @@ class CustomAdminSite(admin.AdminSite):
             app_list += [
                 {
                     "name": "Custom Admin Pages",
-                    "app_label": settings.DEFAULT_CUSTOM_ADMIN_APP_LABEL,
-                    "app_url": f"/{reverse('admin:index')}/{settings.DEFAULT_CUSTOM_ADMIN_PATH}/",
+                    "app_label": settings.CUSTOM_ADMIN_DEFAULT_APP_LABEL,
+                    "app_url": f"/{reverse('admin:index')}/{settings.CUSTOM_ADMIN_DEFAULT_PATH}/",
                     "models": custom_admin_views,
                 }
             ]

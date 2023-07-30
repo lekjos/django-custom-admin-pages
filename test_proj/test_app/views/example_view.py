@@ -1,8 +1,7 @@
-from django.conf import settings
 from django.contrib import admin
 from django.views.generic import TemplateView
 
-from ..views.admin_base_view import AdminBaseView
+from django_custom_admin_pages.views.admin_base_view import AdminBaseView
 
 
 class ExampleAdminView(AdminBaseView, TemplateView):
@@ -26,5 +25,4 @@ class ExampleAdminView(AdminBaseView, TemplateView):
 
 
 # register the view after you create it
-if settings.ENV == "development":
-    admin.site.register_view(ExampleAdminView)
+admin.site.register_view(ExampleAdminView)
