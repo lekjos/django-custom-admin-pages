@@ -12,9 +12,7 @@ class ExampleAdminView(AdminBaseView, TemplateView):
     """
 
     view_name = "Example View"
-    route_name = "example_view"
     template_name = "example_view.html"
-    app_label = "django_custom_admin_pages"  # if you want your view to be in another app, use the label from settings.
 
     # always call super() on get_context_data and use it to start your context dict.
     # the context required to render admin nav-bar is included here.
