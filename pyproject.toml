@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "django-custom-admin-pages"
-version = "0.1.0"
+version = "0.1.6"
 description = "A django app that lets you add standard class-based views to the django admin index and navigation."
 authors = ["lekjos"]
 license = "BSD"
@@ -15,6 +15,13 @@ classifiers = [
 ]
 include = [
     "LICENSE.md",
+]
+exclude = [
+    "django_custom_admin_pages/boot_django.py",
+    "django_custom_admin_pages/conftest.py",
+    "django_custom_admin_pages/pytest.ini",
+    "django_custom_admin_pages/test_proj",
+    "django_custom_admin_pages/tests",
 ]
 packages = [{include = "django_custom_admin_pages"}]
 

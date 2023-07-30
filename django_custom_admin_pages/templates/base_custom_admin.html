@@ -1,0 +1,14 @@
+{% extends 'admin/base_site.html' %}
+{% load static %}
+{% block responsive %}
+  {{ block.super }}
+  <!-- add additional scripts here -->
+{% endblock %}
+
+{% block title %}
+  {{ title }}
+{% endblock %}
+{% block content %}
+  <h1>This is an example custom admin view.</h1>
+  <p>Override the content block with your page content.</p>
+{% endblock %}

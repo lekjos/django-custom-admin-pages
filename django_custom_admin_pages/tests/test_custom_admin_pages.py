@@ -38,33 +38,33 @@ def reload_urlconf(urlconf=None):
 class AnExampleView(AdminBaseView, TemplateView):
     view_name = "Test Name"
     route_name = "test_route"
-    template_name = "example_view.html"
+    template_name = "base_custom_admin.html"
 
 
 class AnotherExampleView(AdminBaseView, TemplateView):
     view_name = "Test Name"
     route_name = "test_route1"
-    template_name = "example_view.html"
+    template_name = "base_custom_admin.html"
 
 
 class NotInheretedView(TemplateView):
     view_name = "Test Name"
     route_name = "test_route"
-    template_name = "example_view.html"
+    template_name = "base_custom_admin.html"
 
 
 def not_a_class_based_view(request):
-    return render(request, "example_view.html", context=dict())
+    return render(request, "base_custom_admin.html", context=dict())
 
 
 class NoViewName(AdminBaseView, TemplateView):
     route_name = "test_route2"
-    template_name = "example_view.html"
+    template_name = "base_custom_admin.html"
 
 
 class NoRouteName(AdminBaseView, TemplateView):
     view_name = "Test Name"
-    template_name = "example_view.html"
+    template_name = "base_custom_admin.html"
 
 
 @pytest.fixture
