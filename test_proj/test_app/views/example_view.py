@@ -12,7 +12,7 @@ class ExampleAdminView(AdminBaseView, TemplateView):
     """
 
     view_name = "Example View"
-    template_name = "example_view.html"
+    template_name = "base_custom_admin.html"
 
     # always call super() on get_context_data and use it to start your context dict.
     # the context required to render admin nav-bar is included here.
