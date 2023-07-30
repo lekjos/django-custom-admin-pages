@@ -45,7 +45,6 @@ pytest-django = "^4.5.2"
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
-
 [tool.isort]
 py_version = 310
 src_paths =  ["src"]

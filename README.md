@@ -1,4 +1,4 @@
-# Admin-Custom App
+# Django Custom Admin Pages
 This app is in the process from being ported from an existing project into an installable app. 
 
 _This app is currently in beta and only tested in django 3.2 / python 3.10_
