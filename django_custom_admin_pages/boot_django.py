@@ -1,4 +1,5 @@
 import os
+
 import django
 from django.conf import settings
 
@@ -11,7 +12,6 @@ def boot_django():
     settings.configure(
         DEBUG=True,
         SECRET_KEY="deadbeefdeadbeefdeadbeef-deefbed",
-        ENV="development",
         DATABASES=(
             {
                 "default": {
@@ -27,10 +27,33 @@ def boot_django():
             "django_custom_admin_pages",
             "django_custom_admin_pages.admin.CustomAdminConfig",
         ),
-        TIME_ZONE=("UTC",),
-        USE_TZ=(True,),
+        MIDDLEWARE=[
+            "django.middleware.security.SecurityMiddleware",
+            "django.contrib.sessions.middleware.SessionMiddleware",
+            "django.middleware.common.CommonMiddleware",
+            "django.contrib.auth.middleware.AuthenticationMiddleware",
+            "django.middleware.clickjacking.XFrameOptionsMiddleware",
+        ],
+        TIME_ZONE="UTC",
+        ROOT_URLCONF="django_custom_admin_pages.tests.test_urls",
+        USE_TZ=True,
         DEFAULT_CUSTOM_ADMIN_PATH="django-custom-admin-pages/",
         CUSTOM_ADMIN_DEFAULT_APP_LABEL="django_custom_admin_pages",
+        TEMPLATES=[
+            {
+                "BACKEND": "django.template.backends.django.DjangoTemplates",
+                "DIRS": [os.path.join(os.path.join(BASE_DIR, "tests"), "templates")],
+                "APP_DIRS": True,
+                "OPTIONS": {
+                    "context_processors": [
+                        "django.template.context_processors.debug",
+                        "django.template.context_processors.request",
+                        "django.contrib.auth.context_processors.auth",
+                        "django.contrib.messages.context_processors.messages",
+                    ],
+                },
+            },
+        ],
     )
     django.setup()
 

@@ -1,12 +1,7 @@
-#### DO NOT ADD MODELADMINS HERE ####
-# To create an admin page in this app, create a view and url route
-# This app is specifically for admin views that custom and not associated with modeladmin object.
-
-
 import contextlib
 from collections import namedtuple
 from collections.abc import Iterable
-from typing import TYPE_CHECKING, Dict, List, Type, Union
+from typing import TYPE_CHECKING, List, Type, Union
 
 from django.conf import settings
 from django.contrib import admin
@@ -49,7 +44,7 @@ class CustomAdminSite(admin.AdminSite):
             if len(urlpatterns) > 0:
                 my_urls = [
                     path(
-                        settings.DEFAULT_CUSTOM_ADMIN_PATH,
+                        "",
                         include("django_custom_admin_pages.urls"),
                     )
                 ]
@@ -57,9 +52,7 @@ class CustomAdminSite(admin.AdminSite):
 
         return urls
 
-    def register_view(
-        self, view_or_iterable: Union[Iterable, "AdminBaseView"], **options
-    ):
+    def register_view(self, view_or_iterable: Union[Iterable, "AdminBaseView"]):
         """
         Register the given view(s) with the admin class.
 
@@ -78,27 +71,18 @@ class CustomAdminSite(admin.AdminSite):
                     raise ImproperlyConfigured(
                         "Only class-based views inheriting from AdminBaseView can be registered"
                     )
-            except TypeError:
+            except TypeError as e:
                 raise ImproperlyConfigured(
                     "view_or_iterable must be a class_based view or iterable"
-                )
+                ) from e
 
             if (
                 not hasattr(view, "view_name")
                 or view.view_name is None
-                or type(view.view_name) is not str
+                or not isinstance(view.view_name, str)
             ):
                 raise ImproperlyConfigured(
                     "View must have name attribute set as string."
-                )
-
-            if (
-                not hasattr(view, "route_name")
-                or view.route_name is None
-                or type(view.route_name) is not str
-            ):
-                raise ImproperlyConfigured(
-                    "View must have route_name attribute set as string matching url_conf name."
                 )
 
             if view in self._view_registry:
@@ -117,37 +101,12 @@ class CustomAdminSite(admin.AdminSite):
         original_length = len(self._view_registry)
 
         for view in view_or_iterable:
-            search_func = lambda x: x.view_name != view.view_name and get_app_label(
-                x
-            ) != get_app_label(view)
-
-            self._view_registry = list(
-                filter(
-                    search_func,
-                    self._view_registry,
-                )
-            )
+            self._view_registry.remove(view)
 
             if len(self._view_registry) == original_length:
                 raise admin.sites.NotRegistered(
                     f"The view {view.__name__} is not registered"
                 )
-
-    def get_custom_admin_model_views(self, request=None) -> List[Dict]:
-        """
-        Returns list of dicts for each modelview in custom admin app.
-        """
-        custom_admin_views = [
-            view
-            for view in self._view_registry
-            if get_app_label(view) == settings.CUSTOM_ADMIN_DEFAULT_APP_LABEL
-        ]
-
-        return [
-            self._build_modelview(view)
-            for view in custom_admin_views
-            if request is None or view.user_has_permission(request.user)
-        ]
 
     def _build_modelview(self, view) -> dict:
         """
@@ -167,23 +126,35 @@ class CustomAdminSite(admin.AdminSite):
         Adds registered apps to perch-admin app list used for nav.
         """
         app_list = super().get_app_list(request)
+        custom_admin_models = []
 
         for view in self._view_registry:
+            found = False
+            view_app_label = get_app_label(view).lower()
+            if view_app_label == settings.CUSTOM_ADMIN_DEFAULT_APP_LABEL:
+                custom_admin_models.append(self._build_modelview(view))
+                continue
+
             for app in app_list:
-                if get_app_label(view).lower() == app.get("app_label", "").lower():
+                if view_app_label == app.get("app_label", "").lower():
                     if view.user_has_permission(request.user):
                         app_models = app["models"]
                         app_models.append(self._build_modelview(view))
                         app_models.sort(key=lambda x: x["name"])
+                        found = True
                         break
+            if not found:
+                raise ImproperlyConfigured(
+                    f'The following custom admin view has an app_label that couldn\'t be found: "{view.__name__}". Please check that "{view_app_label}" is a valid app_label.'
+                )
 
-        if custom_admin_views := self.get_custom_admin_model_views(request):
+        if custom_admin_models:
             app_list += [
                 {
                     "name": "Custom Admin Pages",
                     "app_label": settings.CUSTOM_ADMIN_DEFAULT_APP_LABEL,
-                    "app_url": f"/{reverse('admin:index')}/{settings.CUSTOM_ADMIN_DEFAULT_PATH}/",
-                    "models": custom_admin_views,
+                    "app_url": f"{reverse('admin:index')}{settings.CUSTOM_ADMIN_DEFAULT_APP_LABEL}/",
+                    "models": custom_admin_models,
                 }
             ]
             app_list = sorted(app_list, key=lambda x: x["name"])

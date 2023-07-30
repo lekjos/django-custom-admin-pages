@@ -1,5 +1,4 @@
 from django.apps import AppConfig
-import re
 
 
 class DjangoCustomAdminPagesConfig(AppConfig):
@@ -7,8 +6,9 @@ class DjangoCustomAdminPagesConfig(AppConfig):
 
     def ready(self):
         # Load default settings when the app is ready
-        from . import default_settings
         from django.conf import settings
+
+        from . import default_settings
 
         for setting in dir(default_settings):
             if not hasattr(settings, setting):

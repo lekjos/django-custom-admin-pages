@@ -24,3 +24,14 @@ pytest-django = "^4.5.2"
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+
+[tool.isort]
+py_version = 310
+src_paths =  ["src"]
+include_trailing_comma = true
+profile = "black"
+default_section = "THIRDPARTY"
+known_first_party = ["src"]
+known_django = ["django"]
+sections = ["FUTURE", "STDLIB", "DJANGO", "THIRDPARTY", "FIRSTPARTY", "LOCALFOLDER"]

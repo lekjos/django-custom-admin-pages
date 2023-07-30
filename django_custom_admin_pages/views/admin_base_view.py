@@ -1,6 +1,5 @@
 from typing import TYPE_CHECKING, Optional
 
-
 from django.contrib import admin
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.core.exceptions import ImproperlyConfigured
@@ -18,40 +17,45 @@ class AdminBaseView(PermissionRequiredMixin, View):
     Base class for custom admin views
     """
 
-    view_name: Optional[str] = None  # Display name for view in admin menu
-    route_name: Optional[str] = None  # The name of the path to be created
-    route_path_slug: Optional[str] = None  # The slug for the path to be created
+    view_name: str = None  # Display name for view in admin menu
+    route_name: Optional[
+        str
+    ] = None  # The name of the path to be created, defaults to no name
+    route_path: Optional[
+        str
+    ] = None  # The slug for the path to be created, defaults to view name
     permission_required = ()
     app_label: Optional[str] = None  # Must match app label in settings or be None
 
     def has_permission(self):
         return self.user_has_permission(self.request.user)
 
-    @classmethod
-    def user_has_permission(cls, user: "AbstractBaseUser") -> bool:
+    def user_has_permission(self, user: "AbstractBaseUser") -> bool:
         """
         Used to check permission without instance.
         """
-        if not user.is_staff and user.is_active:
+        if not user.is_active:
             return False
 
         if user.is_superuser:
             return True
 
-        perms = cls.get_permission_required()
-        return user.has_perms(perms)
+        if user.is_staff:
+            if perms := self.get_permission_required():
+                return user.has_perms(perms)
+            return True
 
-    @classmethod
-    def get_permission_required(cls):
-        if cls.permission_required is None:
-            raise ImproperlyConfigured(
-                "{0} is missing the permission_required attribute. Define {0}.permission_required, or override "
-                "{0}.get_permission_required().".format(cls.__class__.__name__)
-            )
-        if isinstance(cls.permission_required, str):
-            perms = (cls.permission_required,)
+        return False
+
+    def get_permission_required(self):
+        if self.permission_required is None:
+            cls_name = self.__class__.__name__
+            message = f"{cls_name} is missing the permission_required attribute. Define {cls_name}.permission_required, or override {cls_name}.get_permission_required()."
+            raise ImproperlyConfigured(message)
+        if isinstance(self.permission_required, str):
+            perms = (self.permission_required,)
         else:
-            perms = cls.permission_required
+            perms = self.permission_required
         return perms
 
     def get_context_data(self, *args, **kwargs):
