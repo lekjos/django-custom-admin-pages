@@ -20,7 +20,7 @@ packages = [{include = "django_custom_admin_pages"}]
 
 [tool.poetry.dependencies]
 python = "^3.9"
-django = "^3.2"
+django = "^4.2"
 
 [tool.poetry.group.dev.dependencies]
 twine = "^4.0.2"
