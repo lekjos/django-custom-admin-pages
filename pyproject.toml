@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "django-custom-admin-pages"
-version = "0.2.1"
+version = "0.2.2"
 description = "A django app that lets you add standard class-based views to the django admin index and navigation."
 authors = ["lekjos"]
 license = "BSD"
