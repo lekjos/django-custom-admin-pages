@@ -10,6 +10,7 @@ packages = [{include = "django_custom_admin_pages"}]
 [tool.poetry.dependencies]
 python = "^3.10"
 django = "3.2"
+pytest-cov = "^4.1.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.4.0"
