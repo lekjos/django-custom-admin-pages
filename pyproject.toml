@@ -1,13 +1,13 @@
 [tool.poetry]
 name = "django-custom-admin-pages"
-version = "0.2.2"
+version = "1.0"
 description = "A django app that lets you add standard class-based views to the django admin index and navigation."
 authors = ["lekjos"]
 license = "BSD"
 readme = "README.md"
 homepage = "https://github.com/lekjos/django-custom-admin-pages"
 repository = "https://github.com/lekjos/django-custom-admin-pages"
-keywords = ["django", "django-admin", "django admin"]
+keywords = ["django", "django-admin", "django admin", "customize admin", "custom admin", "customize"]
 classifiers = [
     "Environment :: Web Environment",
     "Development Status :: 4 - Beta",
@@ -17,7 +17,12 @@ classifiers = [
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Framework :: Django", 
     "Framework :: Django :: 3.2", 
+    "Framework :: Django :: 4.0", 
+    "Framework :: Django :: 4.1", 
+    "Framework :: Django :: 4.2", 
     "Topic :: Software Development :: Libraries :: Python Modules", 
     "Topic :: Software Development :: Libraries :: Application Frameworks",
 ]

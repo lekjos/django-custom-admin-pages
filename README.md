@@ -1,3 +1,6 @@
+[![PyPI version](https://badge.fury.io/py/django-custom-admin-pages.svg)](https://badge.fury.io/py/django-custom-admin-pages)
+
+
 # Django Custom Admin Pages
 A django app that lets you add standard class-based views to the django admin index and navigation. Create a view, register it like you would a ModelAdmin, and it appears in the Django Admin Nav.
 
@@ -24,9 +27,6 @@ from django_custom_admin_pages.admin import CustomAdminConfig
 class MyCustomAdminSite(CustomAdminConfig):
    pass
 ```
-
-_This app is currently in beta and only tested in django 3.2 / python 3.10_
-
 
 ## Usage
 
