@@ -1,13 +1,13 @@
 [tool.poetry]
 name = "django-custom-admin-pages"
 authors = [
-    { name = "Leif Kjos", email = "leif+pypi@leifkjos.com" },
+    "Leif Kjos <leif+pypi@leifkjos.com>",
 ]
 maintainers = [
     "Leif Kjos <leif+pypi@leifkjos.com>",
+]
 version = "1.0.0"
 description = "A django app that lets you add standard class-based views to the django admin index and navigation."
-authors = ["lekjos"]
 license = "BSD-3-Clause"
 readme = "README.md"
 homepage = "https://github.com/lekjos/django-custom-admin-pages"
@@ -42,7 +42,6 @@ exclude = [
     "django_custom_admin_pages/test_proj",
     "django_custom_admin_pages/tests",
 ]
-dynamic = ["version"]
 
 packages = [{include = "django_custom_admin_pages"}]
 
