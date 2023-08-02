@@ -1,8 +1,8 @@
 [![PyPI version](https://badge.fury.io/py/django-custom-admin-pages.svg)](https://badge.fury.io/py/django-custom-admin-pages)
 [![Tests](https://github.com/lekjos/django-custom-admin-pages/actions/workflows/build_and_test.yml/badge.svg)](https://github.com/lekjos/django-custom-admin-pages/actions/workflows/build_and_test.yml)
 [![codecov](https://codecov.io/gh/lekjos/django-custom-admin-pages/branch/master/graph/badge.svg?token=AJG2WICKXA)](https://codecov.io/gh/lekjos/django-custom-admin-pages)
-![Python Versions](https://img.shields.io/badge/python_versions-3.9_3.10_3.11-blue)
-![Django Versions](https://img.shields.io/badge/python_versions-3.2_4.0_4.1_4.2-blue)
+![Python Versions](https://img.shields.io/badge/Python_Versions-3.9,_3.10,_3.11-blue)
+![Django Versions](https://img.shields.io/badge/Django_Versions-3.2,_4.0,_4.1,_4.2-blue)
 
 
 # Django Custom Admin Pages
