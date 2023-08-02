@@ -1,3 +1,10 @@
+[![PyPI version](https://badge.fury.io/py/django-custom-admin-pages.svg)](https://badge.fury.io/py/django-custom-admin-pages)
+[![Tests](https://github.com/lekjos/django-custom-admin-pages/actions/workflows/build_and_test.yml/badge.svg)](https://github.com/lekjos/django-custom-admin-pages/actions/workflows/build_and_test.yml)
+[![codecov](https://codecov.io/gh/lekjos/django-custom-admin-pages/branch/master/graph/badge.svg?token=AJG2WICKXA)](https://codecov.io/gh/lekjos/django-custom-admin-pages)
+![Python Versions](https://img.shields.io/badge/Python_Versions-3.9,_3.10,_3.11-blue)
+![Django Versions](https://img.shields.io/badge/Django_Versions-3.2,_4.0,_4.1,_4.2-blue)
+
+
 # Django Custom Admin Pages
 A django app that lets you add standard class-based views to the django admin index and navigation. Create a view, register it like you would a ModelAdmin, and it appears in the Django Admin Nav.
 
@@ -24,9 +31,6 @@ from django_custom_admin_pages.admin import CustomAdminConfig
 class MyCustomAdminSite(CustomAdminConfig):
    pass
 ```
-
-_This app is currently in beta and only tested in django 3.2 / python 3.10_
-
 
 ## Usage
 

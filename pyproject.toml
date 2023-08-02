@@ -1,23 +1,34 @@
 [tool.poetry]
 name = "django-custom-admin-pages"
-version = "0.2.2"
+authors = [
+    "Leif Kjos <leif+pypi@leifkjos.com>",
+]
+maintainers = [
+    "Leif Kjos <leif+pypi@leifkjos.com>",
+]
+version = "1.0.0"
 description = "A django app that lets you add standard class-based views to the django admin index and navigation."
-authors = ["lekjos"]
-license = "BSD"
+license = "BSD-3-Clause"
 readme = "README.md"
 homepage = "https://github.com/lekjos/django-custom-admin-pages"
 repository = "https://github.com/lekjos/django-custom-admin-pages"
-keywords = ["django", "django-admin", "django admin"]
+keywords = ["django", "admin", "django-admin", "django admin", "interface", "customize admin", "custom admin", "customize"]
 classifiers = [
+    "Development Status :: 5 - Production/Stable",
     "Environment :: Web Environment",
-    "Development Status :: 4 - Beta",
+    "Framework :: Django", 
+    "Framework :: Django :: 3.2",
+    "Framework :: Django :: 4.0", 
+    "Framework :: Django :: 4.1", 
+    "Framework :: Django :: 4.2", 
     "Intended Audience :: Developers",
+    "License :: OSI Approved :: BSD License",
     "Operating System :: OS Independent",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
-    "Framework :: Django :: 3.2", 
+    "Programming Language :: Python :: 3.11",
     "Topic :: Software Development :: Libraries :: Python Modules", 
     "Topic :: Software Development :: Libraries :: Application Frameworks",
 ]
@@ -31,6 +42,7 @@ exclude = [
     "django_custom_admin_pages/test_proj",
     "django_custom_admin_pages/tests",
 ]
+
 packages = [{include = "django_custom_admin_pages"}]
 
 [tool.poetry.dependencies]
