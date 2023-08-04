@@ -52,6 +52,7 @@ jobs:
       env:
         TOX_ENV: py${{ matrix.python-version}}-django${{ matrix.django }}
       run: |
+        cd django_custom_admin_pages
         tox -e $TOX_ENV
   upload-codecov:
     needs: test
