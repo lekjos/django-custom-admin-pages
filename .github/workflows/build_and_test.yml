@@ -62,7 +62,7 @@ jobs:
     - name: Install Dependencies
       run: |
         pip install --upgrade pip
-        pip install django==4.2 pytest pytest-cov
+        pip install django==4.2 pytest pytest-cov pytest-django coverage
     - name: Run Unit Tests
       run: |
         pytest --cov=./ --cov-report=xml --create-db
