@@ -63,7 +63,7 @@ jobs:
     - name: Install Dependencies
       run: |
         pip install --upgrade pip
-        pip install django@4.2 pytest pyptest-cov
+        pip install django==4.2 pytest pyptest-cov
     - name: Run Unit Tests
       run: |
         cd django_custom_admin_pages
