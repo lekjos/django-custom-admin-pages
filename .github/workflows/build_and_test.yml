@@ -54,9 +54,20 @@ jobs:
       run: |
         tox -e $TOX_ENV
   upload-codecov:
-    needs: test
     runs-on: ubuntu-latest
     steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-python@v4
+      with:
+        python-version: "3.10"
+    - name: Install Dependencies
+      run: |
+        pip install --upgrade pip
+        pip install django==4.2 pytest pytest-cov pytest-django coverage
+    - name: Run Unit Tests
+      run: |
+        cd django_custom_admin_pages
+        pytest --cov=./ --cov-report=xml --create-db
     - name: Upload coverage reports to Codecov
       uses: codecov/codecov-action@v3
       with:
