@@ -1,4 +1,6 @@
 import os
+from pathlib import Path
+import sys
 
 import django
 from django.conf import settings
@@ -6,6 +8,11 @@ from django.conf import settings
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 
 settings_module = "django_custom_admin_pages.app_settings"
+
+# Add the path of "top" directory to the sys.path
+top_level_dir = Path(__file__).resolve().parent.parent
+test_proj_dir = os.path.join(top_level_dir, "test_proj")
+sys.path.append(test_proj_dir)
 
 
 def boot_django():
@@ -26,6 +33,7 @@ def boot_django():
             "django.contrib.sessions",
             "django_custom_admin_pages",
             "django_custom_admin_pages.admin.CustomAdminConfig",
+            "test_app",
         ),
         MIDDLEWARE=[
             "django.middleware.security.SecurityMiddleware",

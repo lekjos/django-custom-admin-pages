@@ -4,12 +4,12 @@ from importlib import reload
 from django.conf import settings
 from django.contrib import admin
 from django.contrib.auth import get_user_model
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import AbstractUser, Permission
+from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ImproperlyConfigured
 from django.shortcuts import render
-from django.test import Client
+from django.test import RequestFactory
 from django.urls import clear_url_caches, reverse
-from django.urls.exceptions import NoReverseMatch
 from django.utils.text import get_valid_filename, slugify
 from django.views.generic import TemplateView
 
@@ -41,6 +41,14 @@ class AnExampleView(AdminBaseView, TemplateView):
     template_name = "base_custom_admin.html"
 
 
+class AnExampleAppView(AdminBaseView, TemplateView):
+    view_name = "Test App View"
+    app_label = "test_app"
+    route_name = "test_app_route"
+    template_name = "base_custom_admin.html"
+    permission_required = "test_app.test_perm"
+
+
 class AnotherExampleView(AdminBaseView, TemplateView):
     view_name = "Test Name"
     route_name = "test_route1"
@@ -68,7 +76,7 @@ class NoRouteName(AdminBaseView, TemplateView):
 
 
 @pytest.fixture
-def user():
+def superuser():
     return User.objects.create(
         username="Julian",
         password="JulianTheWizard",
@@ -78,7 +86,7 @@ def user():
     )
 
 
-class TestRegisterBadViews:
+class TestRegistration:
     """
     Test registering a view
     """
@@ -102,76 +110,157 @@ class TestRegisterBadViews:
         with pytest.raises(ImproperlyConfigured):
             admin.site.register_view(NotInheretedView)
 
+    def test_register_twice(self):
+        with pytest.raises(admin.sites.AlreadyRegistered):
+            admin.site.register_view([AnExampleView, AnExampleView])
+        admin.site.unregister_view(AnExampleView)
 
-def test_register_twice():
-    with pytest.raises(admin.sites.AlreadyRegistered):
-        admin.site.register_view([AnExampleView, AnExampleView])
+    def test_unregister_unregistered_raises_error(self):
+        with pytest.raises(admin.sites.NotRegistered):
+            admin.site.unregister_view(AnExampleView)
+
+    def test_register_multiple(self):
+        admin.site.register_view([AnExampleView, AnotherExampleView])
+        admin.site.unregister_view([AnExampleView, AnotherExampleView])
+
+
+@pytest.fixture
+def view():
+    admin.site.register_view(AnExampleView)
+    reload_urlconf()
+    yield
     admin.site.unregister_view(AnExampleView)
 
 
-def unregister_unregistered_raises_error():
-    with pytest.raises(admin.sites.NotRegistered):
-        admin.site.unregister_view(AnExampleView)
+@pytest.fixture
+def app_view():
+    admin.site.register_view(AnExampleAppView)
+    reload_urlconf()
+    yield
+    admin.site.unregister_view(AnExampleAppView)
 
 
-def test_register_multiple():
-    admin.site.register_view([AnExampleView, AnotherExampleView])
-    admin.site.unregister_view([AnExampleView, AnotherExampleView])
+class TestPageRendering:
+    @pytest.fixture
+    def super_client(self, client, superuser):
+        client.force_login(superuser)
+        assert superuser.is_staff
+        assert superuser.is_active
+        assert superuser.is_superuser
+        return client
+
+    @pytest.mark.django_db
+    def test_admin_index_newly_registered_view(self, view, super_client):
+        """
+        Verify that view is in admin custom views
+        """
+
+        # add route in runtime and reload urlconf
+
+        r = super_client.get(reverse("admin:test_route"))
+        assert r.status_code == 200
+
+        django_custom_admin_pages_dict: dict = list(
+            filter(
+                lambda x: x["app_label"] == "django_custom_admin_pages",
+                r.context["app_list"],
+            )
+        )[0]
+        test_view: dict = list(
+            filter(
+                lambda x: x["admin_url"] == f"{django_custom_admin_pages_URL}test-name",
+                django_custom_admin_pages_dict["models"],
+            )
+        )[0]
+
+        assert (
+            django_custom_admin_pages_dict["app_url"] == django_custom_admin_pages_URL
+        )
+        assert django_custom_admin_pages_dict["name"] == "Custom Admin Pages"
+        assert (
+            django_custom_admin_pages_dict["app_label"]
+            == settings.CUSTOM_ADMIN_DEFAULT_APP_LABEL
+        )
+        assert test_view["name"] == "Test Name" == test_view["object_name"]
+        assert test_view["view_only"]
+
+    @pytest.mark.django_db
+    def test_admin_index_newly_registered_app_view(self, app_view, super_client):
+        """
+        Verify that view is in admin custom views
+        """
+
+        # add route in runtime and reload urlconf
+
+        r = super_client.get(reverse("admin:test_app_route"))
+        assert r.status_code == 200
+
+        app_dict: dict = [
+            x for x in r.context["app_list"] if x["app_label"] == "test_app"
+        ][0]
+
+        test_view: dict = [
+            x
+            for x in app_dict["models"]
+            if x["admin_url"] == "/admin/test_app/test-app-view"
+        ][0]
+
+        assert app_dict["app_url"] == "/admin/test_app/"
+        assert app_dict["name"] == "Test_App"
+        assert app_dict["app_label"] == "test_app"
+        assert test_view["name"] == "Test App View" == test_view["object_name"]
+        assert test_view["view_only"]
 
 
 @pytest.mark.django_db
-def test_admin_index_newly_registered_view(user):
-    """
-    Verify that view is in admin custom views
-    """
+def test_get_app_list(superuser, app_view):
+    request_factory = RequestFactory()
+    request = request_factory.get(reverse("admin:index"))
+    request.user = superuser
 
-    # add route in runtime and reload urlconf
+    app_list = admin.site.get_app_list(request)
+    test_app = [x for x in app_list if x["name"] == "Test_App"][0]
+    assert len([x for x in test_app["models"] if x["name"] == "Test App View"]) == 1
 
-    admin.site.register_view(AnExampleView)
-    reload_urlconf()
 
-    c = Client()
-    c.force_login(user)
-    assert user.is_staff
-    assert user.is_active
-    assert user.is_superuser
+class TestPermissions:
+    @pytest.fixture
+    def test_app_ct(self):
+        return ContentType.objects.get(app_label="test_app", model="somemodel")
 
-    r = c.get(reverse("admin:test_route"))
-    assert r.status_code == 200
-
-    django_custom_admin_pages_dict: dict = list(
-        filter(
-            lambda x: x["app_label"] == "django_custom_admin_pages",
-            r.context["app_list"],
+    @pytest.fixture
+    def permission(self, test_app_ct):
+        return Permission.objects.create(
+            name="Test Perm", codename="test_perm", content_type=test_app_ct
         )
-    )[0]
-    test_view: dict = list(
-        filter(
-            lambda x: x["admin_url"] == f"{django_custom_admin_pages_URL}test-name",
-            django_custom_admin_pages_dict["models"],
+
+    @pytest.fixture
+    def user(self, permission):
+        u = User.objects.create(
+            username="Bill",
+            password="Billspw",
+            is_staff=True,
+            is_active=True,
         )
-    )[0]
+        u.user_permissions.add(permission)
+        return u
 
-    assert django_custom_admin_pages_dict["app_url"] == django_custom_admin_pages_URL
-    assert django_custom_admin_pages_dict["name"] == "Custom Admin Pages"
-    assert (
-        django_custom_admin_pages_dict["app_label"]
-        == settings.CUSTOM_ADMIN_DEFAULT_APP_LABEL
-    )
-    assert test_view["name"] == "Test Name" == test_view["object_name"]
-    assert test_view["view_only"]
+    @pytest.mark.django_db
+    def it_shows_if_user_has_permission(sefl, user, app_view):
+        request_factory = RequestFactory()
+        request = request_factory.get(reverse("admin:index"))
+        request.user = user
 
+        app_list = admin.site.get_app_list(request)
+        test_app = [x for x in app_list if x["name"] == "Test_App"][0]
+        assert len([x for x in test_app["models"] if x["name"] == "Test App View"]) == 1
 
-def check_django_custom_admin_pages_route_names():
-    admin_site = admin.site
-    registered_views = admin_site._view_registry
+    @pytest.mark.django_db
+    def it_doesnt_show_if_user_has_no_permission(sefl, user, app_view):
+        user.user_permissions.clear()
+        request_factory = RequestFactory()
+        request = request_factory.get(reverse("admin:index"))
+        request.user = user
 
-    for view in registered_views:
-        try:
-            reverse(view.route_name)
-        except NoReverseMatch:
-            view_name = getattr(view, "view_name", view.__name__)
-            message = f"Custom Admin View: {view_name} is routed incorrectly. Could not find route named: \
-{view.route_name}. Check that you registered a url path in django_custom_admin_pages.urls and that the name matches \
-<view_class>.route_name."
-            pytest.fail(message)
+        app_list = admin.site.get_app_list(request)
+        assert len([x for x in app_list if x["name"] == "Test_App"]) == 0

@@ -3,6 +3,7 @@ from collections import namedtuple
 from collections.abc import Iterable
 from typing import TYPE_CHECKING, List, Type, Union
 
+from django.apps import apps
 from django.conf import settings
 from django.contrib import admin
 from django.contrib.admin.apps import AdminConfig
@@ -17,6 +18,11 @@ if TYPE_CHECKING:
 
 
 ViewRegister = namedtuple("ViewRegister", ["app_label", "view"])
+
+
+def get_installed_apps():
+    installed_apps = [app_config.name for app_config in apps.get_app_configs()]
+    return installed_apps
 
 
 def get_app_label(view: View) -> str:
@@ -95,18 +101,25 @@ class CustomAdminSite(admin.AdminSite):
             add_view_to_conf(view)
 
     def unregister_view(self, view_or_iterable: Union[Iterable, Type]):
+        def _raise_not_registered(view, e=None):
+            msg = f"The view {view.__name__} is not registered"
+            if e:
+                raise admin.sites.NotRegistered(msg) from e
+            raise admin.sites.NotRegistered(msg)
+
         if not isinstance(view_or_iterable, Iterable):
             view_or_iterable = [view_or_iterable]
 
         original_length = len(self._view_registry)
 
         for view in view_or_iterable:
-            self._view_registry.remove(view)
+            try:
+                self._view_registry.remove(view)
+            except ValueError as e:
+                _raise_not_registered(view, e)
 
             if len(self._view_registry) == original_length:
-                raise admin.sites.NotRegistered(
-                    f"The view {view.__name__} is not registered"
-                )
+                _raise_not_registered(view)
 
     def _build_modelview(self, view) -> dict:
         """
@@ -123,7 +136,7 @@ class CustomAdminSite(admin.AdminSite):
 
     def get_app_list(self, request):
         """
-        Adds registered apps to perch-admin app list used for nav.
+        Adds registered apps to admin app list used for nav.
         """
         app_list = super().get_app_list(request)
         custom_admin_models = []
@@ -131,18 +144,37 @@ class CustomAdminSite(admin.AdminSite):
         for view in self._view_registry:
             found = False
             view_app_label = get_app_label(view).lower()
-            if view_app_label == settings.CUSTOM_ADMIN_DEFAULT_APP_LABEL:
-                custom_admin_models.append(self._build_modelview(view))
-                continue
+            if view().user_has_permission(request.user):
+                if view_app_label == settings.CUSTOM_ADMIN_DEFAULT_APP_LABEL:
+                    custom_admin_models.append(self._build_modelview(view))
+                    continue
 
             for app in app_list:
                 if view_app_label == app.get("app_label", "").lower():
-                    if view.user_has_permission(request.user):
+                    found = True
+                    if view().user_has_permission(request.user):
                         app_models = app["models"]
                         app_models.append(self._build_modelview(view))
                         app_models.sort(key=lambda x: x["name"])
-                        found = True
                         break
+
+            if not found:
+                remaining_apps = set(set(get_installed_apps())).difference(app_list)
+                for app in remaining_apps:
+                    if view_app_label == app:
+                        found = True
+                        if view().user_has_permission(request.user):
+                            app_config = apps.get_app_config(view_app_label)
+                            app_name = app_config.verbose_name
+                            app_list.append(
+                                {
+                                    "name": app_name,
+                                    "app_label": view_app_label,
+                                    "app_url": f"{reverse(f'{self.name}:{view.route_name}')}{view_app_label}/",
+                                    "models": [self._build_modelview(view)],
+                                }
+                            )
+
             if not found:
                 raise ImproperlyConfigured(
                     f'The following custom admin view has an app_label that couldn\'t be found: "{view.__name__}". Please check that "{view_app_label}" is a valid app_label.'
@@ -153,7 +185,7 @@ class CustomAdminSite(admin.AdminSite):
                 {
                     "name": "Custom Admin Pages",
                     "app_label": settings.CUSTOM_ADMIN_DEFAULT_APP_LABEL,
-                    "app_url": f"{reverse('admin:index')}{settings.CUSTOM_ADMIN_DEFAULT_APP_LABEL}/",
+                    "app_url": f"{reverse(f'{self.name}:index')}{settings.CUSTOM_ADMIN_DEFAULT_APP_LABEL}/",
                     "models": custom_admin_models,
                 }
             ]
