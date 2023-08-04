@@ -25,11 +25,15 @@ INSTALLED_APPS = [
    # ...
 ]
 ```
-4. If you've defined a custom django admin site, you can also subclass `django_custom_admin_pages.admin.CustomAdminConfig`:
+4. If you've defined a custom django admin site, you can also subclass `django_custom_admin_pages.admin.CustomAdminConfig` and/or `django_custom_admin_pages.admin.CustomAdminSite`:
 
 ```python
-from django_custom_admin_pages.admin import CustomAdminConfig
-class MyCustomAdminSite(CustomAdminConfig):
+from django_custom_admin_pages.admin import CustomAdminConfig, CustomAdminSite
+
+class MyCustomAdminConfig(CustomAdminConfig):
+   default_site="path.to.MyCustomAdminSite"
+
+class MyCustomAdminSite(CustomAdminSite):
    pass
 ```
 
