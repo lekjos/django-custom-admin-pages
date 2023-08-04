@@ -91,22 +91,22 @@ class TestRegistration:
     Test registering a view
     """
 
-    def it_raises_when_not_class_based(self):
+    def test_it_raises_when_not_class_based(self):
         with pytest.raises(ImproperlyConfigured):
             admin.site.register_view(not_a_class_based_view)
 
-    def it_raises_when_no_view_name(self):
+    def test_it_raises_when_no_view_name(self):
         with pytest.raises(ImproperlyConfigured):
             admin.site.register_view(NoViewName)
 
-    def it_doesnt_raise_when_no_route_name(self):
+    def test_it_doesnt_raise_when_no_route_name(self):
         admin.site.register_view(NoRouteName)
         assert (
             NoRouteName.route_name == get_valid_filename(NoRouteName.view_name).lower()
         )
         assert NoRouteName.route_path == slugify(NoRouteName.view_name).lower()
 
-    def it_raises_when_not_subclassed(self):
+    def test_it_raises_when_not_subclassed(self):
         with pytest.raises(ImproperlyConfigured):
             admin.site.register_view(NotInheretedView)
 
@@ -246,7 +246,7 @@ class TestPermissions:
         return u
 
     @pytest.mark.django_db
-    def it_shows_if_user_has_permission(sefl, user, app_view):
+    def test_it_shows_if_user_has_permission(sefl, user, app_view):
         request_factory = RequestFactory()
         request = request_factory.get(reverse("admin:index"))
         request.user = user
@@ -256,7 +256,7 @@ class TestPermissions:
         assert len([x for x in test_app["models"] if x["name"] == "Test App View"]) == 1
 
     @pytest.mark.django_db
-    def it_doesnt_show_if_user_has_no_permission(sefl, user, app_view):
+    def test_it_doesnt_show_if_user_has_no_permission(sefl, user, app_view):
         user.user_permissions.clear()
         request_factory = RequestFactory()
         request = request_factory.get(reverse("admin:index"))
