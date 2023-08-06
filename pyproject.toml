@@ -60,6 +60,7 @@ pylint-django = "^2.5.3"
 isort = "^5.12.0"
 coverage = "^7.2.7"
 pytest-django = "^4.5.2"
+sphinx = "^7.1.2"
 
 [build-system]
 requires = ["poetry-core"]
