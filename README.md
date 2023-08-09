@@ -10,8 +10,12 @@
 # Django Custom Admin Pages
 A django app that lets you add standard class-based views to the django admin index and navigation. Create a view, register it like you would a ModelAdmin, and it appears in the Django Admin Nav.
 
+![Example View](docs/source/static/example_view.png)
 
-## Installation
+Check out the [full documentation](https://django-custom-admin-pages.readthedocs.io) for more in-depth information.
+
+
+## Quick Start
 
 1. Install the app from pypi `pip install django_custom_admin_pages`
 2. Remove `django.contrib.admin` from your installed apps
@@ -26,21 +30,8 @@ INSTALLED_APPS = [
    # ...
 ]
 ```
-4. If you've defined a custom django admin site, you can also subclass `django_custom_admin_pages.admin.CustomAdminConfig` and/or `django_custom_admin_pages.admin.CustomAdminSite`:
-
-```python
-from django_custom_admin_pages.admin import CustomAdminConfig, CustomAdminSite
-
-class MyCustomAdminConfig(CustomAdminConfig):
-   default_site="path.to.MyCustomAdminSite"
-
-class MyCustomAdminSite(CustomAdminSite):
-   pass
-```
 
 ## Usage
-
-This app is for custom admin views which aren't associated with a specific model. Add dashboards and other custom admin views here.
 
 To create a new custom admin view:
 
@@ -49,11 +40,8 @@ To create a new custom admin view:
 3. Register the view similar to how you would register a ModelAdmin using a custom admin function: `admin.site.register_view(YourView)`.
 4. Use the template `django_custom_admin_pages.templates.base_custom_admin.html` as a sample for how to extend the admin templates so that your view has the admin nav.
 
-5. _Optional_: Set the view class attribute `app_label` to the app you'd like the admin view to display in. This must match a label in `settings.INSTALLED_APPS`. This will default to a new app called `django_custom_admin_pages` if left unset.
-6. _Optional_: Set the view class attribute `route_name` to manually override the automatically generated route_name in `urlpatterns`.
 
-
-See `example_view.py` for more details. (It only routes in local dev)
+Also see `test_proj.test_app.views.example_view.py`
 
 _Example:_
 
@@ -79,63 +67,12 @@ class YourCustomView(AdminBaseView, TemplateView):
 admin.site.register_view(YourCustomView)
 ```
 
-Your template should extend `admin/base.html` so you don't lose the nav and admin styling:
+Your template should extend `admin/base.html` or `base_custom_admin.html` template:
 ```html
-<!--In your template-->
-{% extends 'admin/base_site.html' %}
-{% load static %} 
-{% block responsive %}
-{{block.super}}
-<!-- add any custom scripts and cdns here-->
-{% endblock responsive %} 
-{% block title %} Example Admin View {% endblock %}
-{% block content %}
-<h1>Hello World</h1>
-{% endblock %}
-```
-OR you can extend the `base_custom_admin.html` template:
-```html
-<!-- your_template.html -->
+<!-- my_template.html -->
 {% extends 'base_custom_admin.html' with title="your page title" %} 
 {% block content %}
 <h1>Hello World</h1>
-{% endblock %}
-```
-
-_Example With Generic ListView:_
-
-```python
-## in django_custom_admin_pages.views.your_special_view.py
-from django.contrib import admin
-from django.views.generic import ListView
-from django_custom_admin_pages.views.admin_base_view import AdminBaseView
-
-class YourSpecialViewWithModels(AdminBaseView, ListView):
-   # Using the Team Model as an example
-   model: Team = Team
-   ordering = ['pk']
-   paginate_by = 5
-   context_object_name = "team"
-   view_name="My Super Special View With Models"
-   route_name="your_special_view_with_models"
-   template_name="my_template_with_models.html"
-   app_label="an_existing_app_in_your_project"
-
-
-admin.site.register_view(YourSpecialViewWithModels)
-```
-
-```html
-<!-- template_with_models.html -->
-{% extends 'admin/base_site.html' %}
-{% block title %} Example Admin View With Models {% endblock %}
-
-{% block content %}
-<h1>Look at all these models:</h1>
-
-{% for object in object_list %}
-<h3>{{ object.name }} | {{ object.pk }}</h3>
-{% endfor %} 
 {% endblock %}
 ```
 

@@ -15,6 +15,38 @@ if TYPE_CHECKING:
 class AdminBaseView(PermissionRequiredMixin, View):
     """
     Base class for custom admin views
+
+
+    :cvar view_name:
+        Display name for view in admin menu
+
+        :type: str or none
+        :default: none
+
+    :cvar route_name:
+        The name of the path to be created, defaults to no route name
+
+        :type: str or none
+        :default: none
+
+    :cvar route_path:
+        The slug for the path to be created, defaults to slugified view name
+
+        :type: str  or none
+        :default: slug-of-view-name
+
+    :cvar permission_required:
+        iterable of permissions codenames required to use view. example format: app_label.codename
+
+        :type: tuple[str]
+        :default: ()
+
+    :cvar app_label:
+        The app label that the view will appear under. Must match an app in settings.INSTALLED_APPS. Defaults
+        to settings.CUSTOM_ADMIN_DEFAULT_APP_LABEL
+
+        :type: [str] or none
+        :default: none
     """
 
     view_name: str = None  # Display name for view in admin menu

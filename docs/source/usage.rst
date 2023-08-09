@@ -24,9 +24,10 @@ Installation
 
 .. code-block:: python
 
+   from django.contrib.admin.apps import AdminConfig
    from django_custom_admin_pages.admin import CustomAdminConfig, CustomAdminSite
 
-   class MyCustomAdminConfig(CustomAdminConfig):
+   class MyCustomAdminConfig(AdminConfig):
       default_site="path.to.MyCustomAdminSite"
 
    class MyCustomAdminSite(CustomAdminSite):
@@ -34,8 +35,6 @@ Installation
 
 Creating Views
 ----------------
-
-This app is for custom admin views which aren't associated with a specific model. Add dashboards and other custom admin views here.
 
 To create a new custom admin view:
 
@@ -50,8 +49,8 @@ To create a new custom admin view:
 
 See ``example_view.py`` for more details. (It only routes in local dev)
 
-Example
-*********
+Example TemplateView
+***********************
 
 .. code-block:: python
 
@@ -75,11 +74,12 @@ Example
 
    admin.site.register_view(YourCustomView)
 
-Your template should extend `admin/base.html` so you don't lose the nav and admin styling:
+Your template should extend ``admin/base.html`` so you don't lose the nav and admin styling:
 
 .. code-block:: html
    
-   <!--In your template-->
+   <!--my_template.html-->
+
    {% extends 'admin/base_site.html' %}
    {% load static %} 
    {% block responsive %}
@@ -91,9 +91,11 @@ Your template should extend `admin/base.html` so you don't lose the nav and admi
    <h1>Hello World</h1>
    {% endblock %}
 
-OR you can extend the ``base_custom_admin.html`` template:
+OR you can extend the ``base_custom_admin.html`` template, provided for convenience:
 
 .. code-block:: html
+
+   <!--my_template.html-->
 
    {% extends 'base_custom_admin.html' with title="your page title" %} 
    {% block content %}
@@ -136,5 +138,11 @@ Example With Generic ListView
    <h3>{{ object.name }} | {{ object.pk }}</h3>
    {% endfor %} 
    {% endblock %}
+
+
+Configurable settings
+-----------------------
+
+``CUSTOM_ADMIN_DEFAULT_APP_LABEL``: set to override the default app_label (default: ``django_custom_admin_pages``)
 
 

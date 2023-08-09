@@ -31,17 +31,29 @@ def get_app_label(view: View) -> str:
 
 
 class CustomAdminConfig(AdminConfig):
+    """
+    AdminConfig for CustomAdminSite. Use if you are not subclassing CustomAdminSite.
+    """
+
     default_site = "django_custom_admin_pages.admin.CustomAdminSite"
 
 
 class CustomAdminSite(admin.AdminSite):
+    """
+    An Admin site which can register standard django views as well as ModelAdmins.
+    User admin.sites.register_view(AdminBaseView) to add a new custom admin view.
+    """
+
     def __init__(self, *args, **kwargs):
         self._view_registry: List["AdminBaseView"] = []
         super().__init__(*args, **kwargs)
 
     def get_urls(self):
         """
-        Adds urls.py to perch-admin routes if url patterns in it
+        Adds registered view urls after adding to ModelAdmin urls.
+
+        :return: url list
+        :rtype: list[path]
         """
         urls = super().get_urls()
         with contextlib.suppress(ImportError):
@@ -60,11 +72,13 @@ class CustomAdminSite(admin.AdminSite):
 
     def register_view(self, view_or_iterable: Union[Iterable, "AdminBaseView"]):
         """
-        Register the given view(s) with the admin class.
+        Register view(s) with the CustomAdminSite. The view(s) should be class-based views inheriting from AdminBaseView.
 
-        The view(s) should be class-based views inheriting from AdminBaseView.
-
-        If the view is already registered, raise AlreadyRegistered.
+        :param view_or_iterable: iterable of views or view
+        :type view_or_iterable: iterable[View] or View
+        :raise admin.sites.AlreadyRegistered: If view is already registered.
+        :return: None
+        :rtype: None
         """
         from .views.admin_base_view import AdminBaseView
 
@@ -101,6 +115,16 @@ class CustomAdminSite(admin.AdminSite):
             add_view_to_conf(view)
 
     def unregister_view(self, view_or_iterable: Union[Iterable, Type]):
+        """
+        Unregisters view from CustomAdminSite.
+
+        :param view_or_iterable: iterable of views or view
+        :type view_or_iterable: iterable[View] or View
+        :raise admin.sites.NotRegistered: If view is already not registered.
+        :return: None
+        :rtype: None
+        """
+
         def _raise_not_registered(view, e=None):
             msg = f"The view {view.__name__} is not registered"
             if e:
@@ -136,7 +160,13 @@ class CustomAdminSite(admin.AdminSite):
 
     def get_app_list(self, request):
         """
-        Adds registered apps to admin app list used for nav.
+        Adds registered views to the app_list after generating ModelAdmin app_list.
+
+        :param request: request
+        :type request: HttpRequest
+        :raise django.core.exceptions.ImproperlyConfigured: if invalid app_label on view class attribute
+        :return: app_list
+        :rtype: List[Dict]
         """
         app_list = super().get_app_list(request)
         custom_admin_models = []
