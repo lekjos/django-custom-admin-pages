@@ -32,4 +32,3 @@ python:
   system_packages: true
   sys_path:
   - /django_custom_admin_pages
-  - /
