@@ -13,6 +13,16 @@ sys.path.insert(0, os.path.abspath("../../django_custom_admin_pages"))
 print("System Path:")
 for path in sys.path:
     print(path)
+
+
+# List all files in the directory
+files = os.listdir(module_dir)
+
+print("\nFiles in module:")
+# Print the list of files
+for file in files:
+    print(file)
+
 from django_custom_admin_pages.boot_django import boot_django
 
 boot_django()

@@ -4,7 +4,7 @@
 [![Tests](https://github.com/lekjos/django-custom-admin-pages/actions/workflows/build_and_test.yml/badge.svg)](https://github.com/lekjos/django-custom-admin-pages/actions/workflows/build_and_test.yml)
 [![Docs](https://readthedocs.org/projects/django-custom-admin-pages/badge/?version=latest)](https://django-custom-admin-pages.readthedocs.io/en/latest/?badge=latest)
 [![CodeCov](https://codecov.io/gh/lekjos/django-custom-admin-pages/branch/master/graph/badge.svg?token=AJG2WICKXA)](https://codecov.io/gh/lekjos/django-custom-admin-pages)
-![PyPI - Downloads](https://img.shields.io/pypi/dw/django-custom-admin-pages)
+![PyPI - Downloads](https://img.shields.io/pypi/dm/django-custom-admin-pages)
 
 
 # Django Custom Admin Pages
