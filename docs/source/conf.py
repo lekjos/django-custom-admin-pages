@@ -15,6 +15,12 @@ for path in sys.path:
     print(path)
 
 
+print("\nModules: ")
+# Iterate over the keys (module names) in sys.modules
+for module_name in sys.modules:
+    print(module_name)
+
+
 # List all files in the directory
 files = os.listdir(module_dir)
 
