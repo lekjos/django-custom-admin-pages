@@ -3,6 +3,7 @@ from collections import namedtuple
 from collections.abc import Iterable
 from typing import TYPE_CHECKING, List, Type, Union
 
+import django
 from django.apps import apps
 from django.conf import settings
 from django.contrib import admin
@@ -168,7 +169,12 @@ class CustomAdminSite(admin.AdminSite):
         :return: app_list
         :rtype: List[Dict]
         """
-        app_list = super().get_app_list(request, app_label=app_label)
+        if django.VERSION >= (4, 1):
+            super_kwargs = {"app_label": app_label}
+        else:
+            super_kwargs = {}
+
+        app_list = super().get_app_list(request, **super_kwargs)
         custom_admin_models = []
 
         for view in self._view_registry:
