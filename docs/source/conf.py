@@ -5,39 +5,9 @@ from pathlib import Path
 
 top_level_dir = Path(__file__).resolve().parent.parent.parent
 module_dir = os.path.join(top_level_dir, "django_custom_admin_pages")
-print(f"top_level_dir: {str(top_level_dir)}")
-print(f"module_dir: {str(module_dir)}")
-sys.path.append(module_dir)
+
+sys.path.append(str(module_dir))
 sys.path.append(str(top_level_dir))
-
-print("System Path:")
-for path in sys.path:
-    print(path)
-
-
-print("\nModules: ")
-# Iterate over the keys (module names) in sys.modules
-for module_name in sys.modules:
-    print(module_name)
-
-
-# List all files in the directory
-files = os.listdir(module_dir)
-
-import pkgutil
-
-# Get a list of all available modules on the Python path
-available_modules = list(pkgutil.iter_modules())
-
-print("\navailable modules:")
-# Print the list of module names
-for module_info in available_modules:
-    print(module_info.name)
-
-print("\nFiles in module:")
-# Print the list of files
-for file in files:
-    print(file)
 
 from django_custom_admin_pages.boot_django import boot_django
 
