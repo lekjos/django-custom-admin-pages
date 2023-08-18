@@ -168,7 +168,7 @@ class CustomAdminSite(admin.AdminSite):
         :return: app_list
         :rtype: List[Dict]
         """
-        app_list = super().get_app_list(request)
+        app_list = super().get_app_list(request, app_label=app_label)
         custom_admin_models = []
 
         for view in self._view_registry:
