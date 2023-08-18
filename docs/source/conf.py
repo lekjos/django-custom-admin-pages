@@ -8,6 +8,9 @@ module_dir = os.path.join(top_level_dir, "django_custom_admin_pages")
 sys.path.append(module_dir)
 sys.path.insert(0, os.path.abspath("../../django_custom_admin_pages"))
 
+print("System Path:")
+for path in sys.path:
+    print(path)
 from django_custom_admin_pages.boot_django import boot_django
 
 boot_django()
