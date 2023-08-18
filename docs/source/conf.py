@@ -3,7 +3,7 @@ import os
 import sys
 from pathlib import Path
 
-top_level_dir = Path(__file__).resolve().parent.parent
+top_level_dir = Path(__file__).resolve().parent.parent.parent
 module_dir = os.path.join(top_level_dir, "django_custom_admin_pages")
 print(f"top_level_dir: {str(top_level_dir)}")
 print(f"module_dir: {str(module_dir)}")
