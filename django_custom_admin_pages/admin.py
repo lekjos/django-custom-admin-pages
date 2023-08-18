@@ -158,7 +158,7 @@ class CustomAdminSite(admin.AdminSite):
             "view_only": True,
         }
 
-    def get_app_list(self, request):
+    def get_app_list(self, request, app_label=None):
         """
         Adds registered views to the app_list after generating ModelAdmin app_list.
 
