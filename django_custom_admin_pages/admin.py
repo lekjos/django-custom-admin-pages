@@ -169,10 +169,7 @@ class CustomAdminSite(admin.AdminSite):
         :return: app_list
         :rtype: List[Dict]
         """
-        if django.VERSION >= (4, 1):
-            super_kwargs = {"app_label": app_label}
-        else:
-            super_kwargs = {}
+        super_kwargs = {"app_label": app_label} if django.VERSION >= (4, 1) else {}
 
         app_list = super().get_app_list(request, **super_kwargs)
         custom_admin_models = []
