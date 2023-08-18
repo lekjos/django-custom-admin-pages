@@ -123,3 +123,6 @@ dmypy.json
 .cnf
 
 .vscode
+
+temp
+docs/source/generated
