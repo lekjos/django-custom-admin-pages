@@ -24,6 +24,16 @@ for module_name in sys.modules:
 # List all files in the directory
 files = os.listdir(module_dir)
 
+import pkgutil
+
+# Get a list of all available modules on the Python path
+available_modules = list(pkgutil.iter_modules())
+
+print("\navailable modules:")
+# Print the list of module names
+for module_info in available_modules:
+    print(module_info.name)
+
 print("\nFiles in module:")
 # Print the list of files
 for file in files:
