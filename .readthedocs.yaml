@@ -31,4 +31,4 @@ python:
   - requirements: docs/requirements.txt
   system_packages: true
   sys_path:
-  - /django_custom_admin_pages
+  - ./django_custom_admin_pages
