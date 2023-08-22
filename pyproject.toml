@@ -61,7 +61,7 @@ isort = "^5.12.0"
 coverage = "^7.3"
 pytest-django = "^4.5.2"
 sphinx-rtd-theme = "^1.2.2"
-sphinx = "^6"
+sphinx = ">=6,<8"
 sphinx-autobuild = "^2021.3.14"
 
 [build-system]
