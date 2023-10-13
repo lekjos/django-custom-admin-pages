@@ -1,5 +1,5 @@
 [![PyPI](https://img.shields.io/pypi/v/django-custom-admin-pages)](https://pypi.org/project/django-custom-admin-pages/)
-![Python Supported](https://img.shields.io/badge/Python-3.9,_3.10,_3.11-blue)
+![Python Supported](https://img.shields.io/badge/Python-_3.8,_3.9,_3.10,_3.11-blue)
 ![Django Supported](https://img.shields.io/badge/Django-3.2,_4.0,_4.1,_4.2-blue)
 [![Tests](https://github.com/lekjos/django-custom-admin-pages/actions/workflows/build_and_test.yml/badge.svg)](https://github.com/lekjos/django-custom-admin-pages/actions/workflows/build_and_test.yml)
 [![Docs](https://readthedocs.org/projects/django-custom-admin-pages/badge/?version=latest)](https://django-custom-admin-pages.readthedocs.io/en/latest/?badge=latest)
