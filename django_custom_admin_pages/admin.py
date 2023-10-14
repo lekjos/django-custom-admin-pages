@@ -11,8 +11,8 @@ from django.contrib.admin.apps import AdminConfig
 from django.core.exceptions import ImproperlyConfigured
 from django.urls import NoReverseMatch, include, path, reverse
 from django.views import View
-from django_custom_admin_pages.exceptions import CustomAdminImportException
 
+from django_custom_admin_pages.exceptions import CustomAdminImportException
 from django_custom_admin_pages.urls import add_view_to_conf
 
 if TYPE_CHECKING:
