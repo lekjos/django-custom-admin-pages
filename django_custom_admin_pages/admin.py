@@ -9,8 +9,9 @@ from django.conf import settings
 from django.contrib import admin
 from django.contrib.admin.apps import AdminConfig
 from django.core.exceptions import ImproperlyConfigured
-from django.urls import include, path, reverse
+from django.urls import NoReverseMatch, include, path, reverse
 from django.views import View
+from django_custom_admin_pages.exceptions import CustomAdminImportException
 
 from django_custom_admin_pages.urls import add_view_to_conf
 
@@ -150,7 +151,13 @@ class CustomAdminSite(admin.AdminSite):
         """
         Creates dict for custom admin view for use in app_list[models]
         """
-        url = reverse(f"{self.name}:{view.route_name}")
+        try:
+            url = reverse(f"{self.name}:{view.route_name}")
+        except NoReverseMatch as e:
+            message = f"""Cannot find CustomAdminView: {view.view_name}. This is most likely because 
+the root url conf was loaded before the view was registered. Try importing the view at the top of your
+root url conf or placing the registration above url_patterns."""
+            raise CustomAdminImportException(message) from e
         name = view.view_name
         return {
             "name": name,

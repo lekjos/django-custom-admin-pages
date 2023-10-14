@@ -46,8 +46,38 @@ To create a new custom admin view:
 5. *Optional*: Set the view class attribute ``app_label`` to the app you'd like the admin view to display in. This must match a label in ``settings.INSTALLED_APPS``. This will default to a new app called `django_custom_admin_pages` if left unset.
 6. *Optional*: Set the view class attribute ``route_name`` to manually override the automatically generated route_name in ``urlpatterns``.
 
+Registering Views
+-----------------
 
-See ``example_view.py`` for more details. (It only routes in local dev)
+After you create a view, you can register it like you would a ``ModelAdmin``:
+
+.. code-block:: python
+   ### Important: Custom Views Must Be Registered Before Admin URLs are Loaded
+
+   from django.contrib import admin
+
+   admin.site.register_view(MyCustomAdminView)
+
+
+.. warning::
+   Be sure to register your views in a file that's imported before your root url conf! Or import all your views in 
+   the root url conf above ``url_patterns``
+
+
+For example:
+
+.. code-block:: python
+   # project/urls.py
+   from django.contrib import admin
+
+   # importing view before url_patterns ensures it's registered!
+   from some_app.views import YourCustomView 
+
+   url_patterns = [
+      path("admin/", admin.site.urls),
+      ...
+   ]
+
 
 Example TemplateView
 ***********************

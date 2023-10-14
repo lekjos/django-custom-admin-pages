@@ -76,6 +76,23 @@ Your template should extend `admin/base.html` or `base_custom_admin.html` templa
 {% endblock %}
 ```
 
+### Important: Custom Views Must Be Registered Before Admin URLs are Loaded
+
+Be sure to import the files where your views are stored prior to loading your root url conf. For example:
+
+```python
+# project/urls.py
+from django.contrib import admin
+
+# importing view before url_patterns ensures it's registered!
+from some_app.views import YourCustomView 
+
+url_patterns = [
+   path("admin/", admin.site.urls),
+   ...
+]
+```
+
 ## Configurable Settings
 
 - `CUSTOM_ADMIN_DEFAULT_APP_LABEL`: set to override the default app_label (default: `django_custom_admin_pages`)
