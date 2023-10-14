@@ -154,9 +154,11 @@ class CustomAdminSite(admin.AdminSite):
         try:
             url = reverse(f"{self.name}:{view.route_name}")
         except NoReverseMatch as e:
-            message = f"""Cannot find CustomAdminView: {view.view_name}. This is most likely because 
-the root url conf was loaded before the view was registered. Try importing the view at the top of your
-root url conf or placing the registration above url_patterns."""
+            message = (
+                f"Cannot find CustomAdminView: {view.view_name}. This is most likely because the "
+                + "root url conf was loaded before the view was registered. Try importing the view at "
+                + "the top of your root url conf or placing the registration above url_patterns."
+            )
             raise CustomAdminImportException(message) from e
         name = view.view_name
         return {
