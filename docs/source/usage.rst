@@ -49,9 +49,10 @@ To create a new custom admin view:
 Registering Views
 -----------------
 
-After you create a view, you can register it like you would a ``ModelAdmin``.
+After you create a view, you can register it like you would a ``ModelAdmin``:
 
 .. code-block:: python
+
    ### Important: Custom Views Must Be Registered Before Admin URLs are Loaded
 
    from django.contrib import admin
@@ -64,9 +65,10 @@ After you create a view, you can register it like you would a ``ModelAdmin``.
    the root url conf above ``url_patterns``
 
 
-e.g.
+For example:
 
 .. code-block:: python
+
    # project/urls.py
    from django.contrib import admin
 
