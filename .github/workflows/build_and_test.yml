@@ -31,7 +31,7 @@ jobs:
         poetry run black . --check
     - name: Analyzing code with isort
       run: |
-        poetry run isort . --check-only
+        poetry run isort . --check-only --skip docs
 
   test:
     strategy:
