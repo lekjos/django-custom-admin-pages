@@ -1,0 +1,2 @@
+class CustomAdminImportException(Exception):
+    pass
