@@ -15,8 +15,8 @@ from django.views.generic import TemplateView
 
 import pytest
 
-from ..views.admin_base_view import AdminBaseView
 from ..exceptions import CustomAdminImportException
+from ..views.admin_base_view import AdminBaseView
 
 User: AbstractUser = get_user_model()
 
