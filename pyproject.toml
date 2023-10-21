@@ -6,7 +6,7 @@ authors = [
 maintainers = [
     "Leif Kjos <leif+pypi@leifkjos.com>",
 ]
-version = "1.2.1"
+version = "1.2.2"
 description = "A django app that lets you add standard class-based views to the django admin index and navigation."
 license = "BSD-3-Clause"
 readme = "README.md"
@@ -26,9 +26,11 @@ classifiers = [
     "Operating System :: OS Independent",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
     "Topic :: Software Development :: Libraries :: Python Modules", 
     "Topic :: Software Development :: Libraries :: Application Frameworks",
 ]

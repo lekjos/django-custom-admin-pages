@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING, Iterable, Optional
 
 from django.contrib import admin
 from django.contrib.auth.mixins import PermissionRequiredMixin
@@ -80,14 +80,18 @@ class AdminBaseView(PermissionRequiredMixin, View):
         return False
 
     def get_permission_required(self):
-        if self.permission_required is None:
+        if not hasattr(self, "permission_required"):
             cls_name = self.__class__.__name__
             message = f"{cls_name} is missing the permission_required attribute. Define {cls_name}.permission_required, or override {cls_name}.get_permission_required()."
             raise ImproperlyConfigured(message)
         if isinstance(self.permission_required, str):
             perms = (self.permission_required,)
-        else:
+        elif isinstance(self.permission_required, Iterable):
             perms = self.permission_required
+        else:
+            raise ValueError(
+                f"{self.__class__.__name__}.permission_required must be a string or iterable"
+            )
         return perms
 
     def get_context_data(self, *args, **kwargs):

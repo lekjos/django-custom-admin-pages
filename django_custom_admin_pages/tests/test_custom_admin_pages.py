@@ -15,6 +15,7 @@ from django.views.generic import TemplateView
 
 import pytest
 
+from ..exceptions import CustomAdminImportException
 from ..views.admin_base_view import AdminBaseView
 
 User: AbstractUser = get_user_model()
@@ -47,6 +48,10 @@ class AnExampleAppView(AdminBaseView, TemplateView):
     route_name = "test_app_route"
     template_name = "base_custom_admin.html"
     permission_required = "test_app.test_perm"
+
+
+class BadAppNameView(AnExampleView):
+    app_label = "fake_app"
 
 
 class AnotherExampleView(AdminBaseView, TemplateView):
@@ -123,6 +128,29 @@ class TestRegistration:
         admin.site.register_view([AnExampleView, AnotherExampleView])
         admin.site.unregister_view([AnExampleView, AnotherExampleView])
 
+    @pytest.mark.django_db
+    def test_register_late_raises(self, superuser):
+        admin.site.register_view(AnExampleView)
+
+        request_factory = RequestFactory()
+
+        with pytest.raises(
+            CustomAdminImportException,
+            match="Cannot find CustomAdminView: Test Name. This is most likely because the root url conf was loaded before the view was registered. Try importing the view at the top of your root url conf or placing the registration above url_patterns.",
+        ):
+            request = request_factory.get(reverse("admin:index"))
+            request.user = superuser
+            admin.site.get_app_list(request)
+
+        admin.site.unregister_view(AnExampleView)
+
+    def test_register_bad_app_name(self):
+        with pytest.raises(
+            ImproperlyConfigured,
+            match="Your view Test Name has an invalid app_label: fake_app. App label must be in settings.INSTALLED_APPS",
+        ):
+            admin.site.register_view(BadAppNameView)
+
 
 @pytest.fixture
 def view():
@@ -133,11 +161,16 @@ def view():
 
 
 @pytest.fixture
-def app_view():
-    admin.site.register_view(AnExampleAppView)
+def view_to_register():
+    return AnExampleAppView
+
+
+@pytest.fixture
+def app_view(view_to_register):
+    admin.site.register_view(view_to_register)
     reload_urlconf()
     yield
-    admin.site.unregister_view(AnExampleAppView)
+    admin.site.unregister_view(view_to_register)
 
 
 class TestPageRendering:
@@ -235,32 +268,98 @@ class TestPermissions:
         )
 
     @pytest.fixture
-    def user(self, permission):
+    def active(self):
+        return True
+
+    @pytest.fixture
+    def staff(self):
+        return True
+
+    @pytest.fixture
+    def user(self, permission, active, staff):
         u = User.objects.create(
             username="Bill",
             password="Billspw",
-            is_staff=True,
-            is_active=True,
+            is_staff=staff,
+            is_active=active,
         )
-        u.user_permissions.add(permission)
+        if permission:
+            u.user_permissions.add(permission)
         return u
 
-    @pytest.mark.django_db
-    def test_it_shows_if_user_has_permission(sefl, user, app_view):
-        request_factory = RequestFactory()
-        request = request_factory.get(reverse("admin:index"))
-        request.user = user
+    class TestCaseRequiredPermission:
+        @pytest.mark.django_db
+        def test_it_shows_if_user_has_permission(self, user, app_view):
+            request_factory = RequestFactory()
+            request = request_factory.get(reverse("admin:index"))
+            request.user = user
 
-        app_list = admin.site.get_app_list(request)
-        test_app = [x for x in app_list if x["name"] == "Test_App"][0]
-        assert len([x for x in test_app["models"] if x["name"] == "Test App View"]) == 1
+            app_list = admin.site.get_app_list(request)
+            test_app = [x for x in app_list if x["name"] == "Test_App"][0]
+            assert (
+                len([x for x in test_app["models"] if x["name"] == "Test App View"])
+                == 1
+            )
 
-    @pytest.mark.django_db
-    def test_it_doesnt_show_if_user_has_no_permission(sefl, user, app_view):
-        user.user_permissions.clear()
-        request_factory = RequestFactory()
-        request = request_factory.get(reverse("admin:index"))
-        request.user = user
+    class TestCaseNotRequiredPermission:
+        @pytest.fixture
+        def view_to_register(self):
+            return AnExampleView
 
-        app_list = admin.site.get_app_list(request)
-        assert len([x for x in app_list if x["name"] == "Test_App"]) == 0
+        @pytest.fixture
+        def permission(self):
+            return None
+
+        @pytest.mark.django_db
+        def test_it_shows_to_staff_with_no_permission(self, user, app_view):
+            user.user_permissions.clear()
+            request_factory = RequestFactory()
+            request = request_factory.get(reverse("admin:index"))
+            request.user = user
+
+            app_list = admin.site.get_app_list(request)
+            test_app = [x for x in app_list if x["name"] == "Custom Admin Pages"][0]
+            assert len([x for x in test_app["models"] if x["name"] == "Test Name"]) == 1
+
+    class TestCaseMissingRequiredPermission:
+        @pytest.fixture
+        def permission(self):
+            return None
+
+        @pytest.mark.django_db
+        def test_it_doesnt_show_if_user_has_no_permission(self, user, app_view):
+            user.user_permissions.clear()
+            request_factory = RequestFactory()
+            request = request_factory.get(reverse("admin:index"))
+            request.user = user
+
+            app_list = admin.site.get_app_list(request)
+            assert len([x for x in app_list if x["name"] == "Test_App"]) == 0
+
+    class TestCaseInactiveUser:
+        @pytest.fixture
+        def active(self):
+            return False
+
+        @pytest.mark.django_db
+        def test_it_denies_inactive_user(self, user, app_view):
+            request_factory = RequestFactory()
+            request = request_factory.get(reverse("admin:index"))
+            request.user = user
+
+            app_list = admin.site.get_app_list(request)
+            assert len([x for x in app_list if x["name"] == "Test_App"]) == 0
+
+    class TestCaseNotStaff:
+        @pytest.fixture
+        def staff(self):
+            return False
+
+        @pytest.mark.django_db
+        def test_it_denies_inactive_user(self, user, app_view):
+            request_factory = RequestFactory()
+            request = request_factory.get(reverse("admin:index"))
+            request.user = user
+
+            app_list = admin.site.get_app_list(request)
+            assert len([x for x in app_list if x["name"] == "Test_App"]) == 0
