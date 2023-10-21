@@ -107,6 +107,12 @@ class CustomAdminSite(admin.AdminSite):
                     "View must have name attribute set as string."
                 )
 
+            if app_label := getattr(view, "app_label", None):
+                if not app_label in settings.INSTALLED_APPS:
+                    raise ImproperlyConfigured(
+                        f"Your view {view.view_name} has an invalid app_label: {app_label}. App label must be in settings.INSTALLED_APPS"
+                    )
+
             if view in self._view_registry:
                 raise admin.sites.AlreadyRegistered(
                     f"View: {str(view.view_name)} is already registered."
