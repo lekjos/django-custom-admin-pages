@@ -6,7 +6,7 @@ authors = [
 maintainers = [
     "Leif Kjos <leif+pypi@leifkjos.com>",
 ]
-version = "1.2.3"
+version = "1.2.4"
 description = "A django app that lets you add standard class-based views to the django admin index and navigation."
 license = "BSD-3-Clause"
 readme = "README.md"
