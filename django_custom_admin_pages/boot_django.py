@@ -34,6 +34,7 @@ def boot_django():
             "django_custom_admin_pages",
             "django_custom_admin_pages.admin.CustomAdminConfig",
             "test_app",
+            "another_test_app.apps.AnotherTestAppConfig",
         ),
         MIDDLEWARE=[
             "django.middleware.security.SecurityMiddleware",

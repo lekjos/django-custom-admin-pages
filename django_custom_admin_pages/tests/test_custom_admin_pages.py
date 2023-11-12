@@ -28,7 +28,7 @@ django_custom_admin_pages_URL = (
 
 def reload_urlconf(urlconf=None):
     """
-    reloads urlconf, or sepecific urls.py passed in via urlconf arg.
+    reloads urlconf, or specific urls.py passed in via urlconf arg.
     """
     urlconf = settings.ROOT_URLCONF
     if urlconf in sys.modules:
@@ -60,7 +60,7 @@ class AnotherExampleView(AdminBaseView, TemplateView):
     template_name = "base_custom_admin.html"
 
 
-class NotInheretedView(TemplateView):
+class NotInheritedView(TemplateView):
     view_name = "Test Name"
     route_name = "test_route"
     template_name = "base_custom_admin.html"
@@ -113,7 +113,7 @@ class TestRegistration:
 
     def test_it_raises_when_not_subclassed(self):
         with pytest.raises(ImproperlyConfigured):
-            admin.site.register_view(NotInheretedView)
+            admin.site.register_view(NotInheritedView)
 
     def test_register_twice(self):
         with pytest.raises(admin.sites.AlreadyRegistered):
@@ -245,15 +245,44 @@ class TestPageRendering:
         assert test_view["view_only"]
 
 
-@pytest.mark.django_db
-def test_get_app_list(superuser, app_view):
-    request_factory = RequestFactory()
-    request = request_factory.get(reverse("admin:index"))
-    request.user = superuser
+class TestGetAppList:
+    class TestCaseStandardRegistration:
+        """test an app registered in INSTALLED_APPS with just app name"""
 
-    app_list = admin.site.get_app_list(request)
-    test_app = [x for x in app_list if x["name"] == "Test_App"][0]
-    assert len([x for x in test_app["models"] if x["name"] == "Test App View"]) == 1
+        @pytest.mark.django_db
+        def test_get_app_list(self, superuser, app_view):
+            request_factory = RequestFactory()
+            request = request_factory.get(reverse("admin:index"))
+            request.user = superuser
+
+            app_list = admin.site.get_app_list(request)
+            test_app = [x for x in app_list if x["name"] == "Test_App"][0]
+            assert (
+                len([x for x in test_app["models"] if x["name"] == "Test App View"])
+                == 1
+            )
+
+    class TestCaseFullRegistration:
+        """test an app registered in INSTALLED_APPS with app_name.apps.appconfig"""
+
+        @pytest.mark.django_db
+        def test_get_app_list(self, superuser):
+            request_factory = RequestFactory()
+            request = request_factory.get(reverse("admin:index"))
+            request.user = superuser
+
+            app_list = admin.site.get_app_list(request)
+            test_app = [x for x in app_list if x["name"] == "Another_Test_App"][0]
+            assert (
+                len(
+                    [
+                        x
+                        for x in test_app["models"]
+                        if x["name"] == "Another Example View"
+                    ]
+                )
+                == 1
+            )
 
 
 class TestPermissions:

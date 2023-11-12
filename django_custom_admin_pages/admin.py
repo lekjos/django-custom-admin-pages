@@ -108,7 +108,7 @@ class CustomAdminSite(admin.AdminSite):
                 )
 
             if app_label := getattr(view, "app_label", None):
-                if not app_label in settings.INSTALLED_APPS:
+                if not app_label in get_installed_apps():
                     raise ImproperlyConfigured(
                         f"Your view {view.view_name} has an invalid app_label: {app_label}. App label must be in settings.INSTALLED_APPS"
                     )
@@ -191,37 +191,44 @@ class CustomAdminSite(admin.AdminSite):
 
         for view in self._view_registry:
             found = False
+            if not view().user_has_permission(request.user):
+                # skip if no permission
+                continue
+
             view_app_label = get_app_label(view).lower()
-            if view().user_has_permission(request.user):
-                if view_app_label == settings.CUSTOM_ADMIN_DEFAULT_APP_LABEL:
-                    custom_admin_models.append(self._build_modelview(view))
-                    continue
+
+            if view_app_label == settings.CUSTOM_ADMIN_DEFAULT_APP_LABEL:
+                custom_admin_models.append(self._build_modelview(view))
+                # add to custom admin
+                continue
 
             for app in app_list:
                 if view_app_label == app.get("app_label", "").lower():
                     found = True
-                    if view().user_has_permission(request.user):
-                        app_models = app["models"]
-                        app_models.append(self._build_modelview(view))
-                        app_models.sort(key=lambda x: x["name"])
-                        break
+                    app_models = app["models"]
+                    app_models.append(self._build_modelview(view))
+                    app_models.sort(key=lambda x: x["name"])
+                    # if app exists add view to models
+                    break
 
             if not found:
-                remaining_apps = set(set(get_installed_apps())).difference(app_list)
+                remaining_apps = set(set(get_installed_apps())).difference(
+                    [x["app_label"] for x in app_list]
+                )
                 for app in remaining_apps:
                     if view_app_label == app:
                         found = True
-                        if view().user_has_permission(request.user):
-                            app_config = apps.get_app_config(view_app_label)
-                            app_name = app_config.verbose_name
-                            app_list.append(
-                                {
-                                    "name": app_name,
-                                    "app_label": view_app_label,
-                                    "app_url": f"{reverse(f'{self.name}:{view.route_name}')}{view_app_label}/",
-                                    "models": [self._build_modelview(view)],
-                                }
-                            )
+                        app_config = apps.get_app_config(view_app_label)
+                        app_name = app_config.verbose_name
+                        # if app doesn't exist, create it and add model.
+                        app_list.append(
+                            {
+                                "name": app_name,
+                                "app_label": view_app_label,
+                                "app_url": f"{reverse(f'{self.name}:{view.route_name}')}{view_app_label}/",
+                                "models": [self._build_modelview(view)],
+                            }
+                        )
 
             if not found:
                 raise ImproperlyConfigured(
@@ -229,13 +236,16 @@ class CustomAdminSite(admin.AdminSite):
                 )
 
         if custom_admin_models:
-            app_list += [
-                {
-                    "name": "Custom Admin Pages",
-                    "app_label": settings.CUSTOM_ADMIN_DEFAULT_APP_LABEL,
-                    "app_url": f"{reverse(f'{self.name}:index')}{settings.CUSTOM_ADMIN_DEFAULT_APP_LABEL}/",
-                    "models": custom_admin_models,
-                }
-            ]
-            app_list = sorted(app_list, key=lambda x: x["name"])
+            # add the default custom admin app if any models
+            app_list += [self._build_custom_admin_app(custom_admin_models)]
+
+        app_list = sorted(app_list, key=lambda x: x["name"])
         return app_list
+
+    def _build_custom_admin_app(self, custom_admin_models):
+        return {
+            "name": "Custom Admin Pages",
+            "app_label": settings.CUSTOM_ADMIN_DEFAULT_APP_LABEL,
+            "app_url": f"{reverse(f'{self.name}:index')}{settings.CUSTOM_ADMIN_DEFAULT_APP_LABEL}/",
+            "models": custom_admin_models,
+        }
