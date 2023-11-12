@@ -17,7 +17,6 @@ import pytest
 
 from ..exceptions import CustomAdminImportException
 from ..views.admin_base_view import AdminBaseView
-from test_proj.another_test_app.views import AnotherExampleAdminView
 
 User: AbstractUser = get_user_model()
 
