@@ -108,7 +108,7 @@ class CustomAdminSite(admin.AdminSite):
                 )
 
             if app_label := getattr(view, "app_label", None):
-                if not app_label in settings.INSTALLED_APPS:
+                if not app_label in get_installed_apps():
                     raise ImproperlyConfigured(
                         f"Your view {view.view_name} has an invalid app_label: {app_label}. App label must be in settings.INSTALLED_APPS"
                     )
@@ -198,8 +198,11 @@ class CustomAdminSite(admin.AdminSite):
                     continue
 
             for app in app_list:
+                if "." in view_app_label:
+                    view_app_label = view_app_label.split(".")[0]
                 if view_app_label == app.get("app_label", "").lower():
                     found = True
+                if found:
                     if view().user_has_permission(request.user):
                         app_models = app["models"]
                         app_models.append(self._build_modelview(view))
@@ -207,7 +210,9 @@ class CustomAdminSite(admin.AdminSite):
                         break
 
             if not found:
-                remaining_apps = set(set(get_installed_apps())).difference(app_list)
+                remaining_apps = set(set(get_installed_apps())).difference(
+                    [x["app_label"] for x in app_list]
+                )
                 for app in remaining_apps:
                     if view_app_label == app:
                         found = True
