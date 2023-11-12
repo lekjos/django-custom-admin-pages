@@ -29,8 +29,7 @@ def get_installed_apps():
 
 def get_app_label(view: View) -> str:
     "returns app label or default app for view"
-    label = getattr(view, "app_label") or settings.CUSTOM_ADMIN_DEFAULT_APP_LABEL
-    return label
+    return getattr(view, "app_label") or settings.CUSTOM_ADMIN_DEFAULT_APP_LABEL
 
 
 class CustomAdminConfig(AdminConfig):
