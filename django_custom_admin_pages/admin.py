@@ -202,7 +202,6 @@ class CustomAdminSite(admin.AdminSite):
                     view_app_label = view_app_label.split(".")[0]
                 if view_app_label == app.get("app_label", "").lower():
                     found = True
-                if found:
                     if view().user_has_permission(request.user):
                         app_models = app["models"]
                         app_models.append(self._build_modelview(view))
