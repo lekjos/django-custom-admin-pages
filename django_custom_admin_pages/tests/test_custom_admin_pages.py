@@ -28,7 +28,7 @@ django_custom_admin_pages_URL = (
 
 def reload_urlconf(urlconf=None):
     """
-    reloads urlconf, or sepecific urls.py passed in via urlconf arg.
+    reloads urlconf, or specific urls.py passed in via urlconf arg.
     """
     urlconf = settings.ROOT_URLCONF
     if urlconf in sys.modules:
@@ -60,7 +60,7 @@ class AnotherExampleView(AdminBaseView, TemplateView):
     template_name = "base_custom_admin.html"
 
 
-class NotInheretedView(TemplateView):
+class NotInheritedView(TemplateView):
     view_name = "Test Name"
     route_name = "test_route"
     template_name = "base_custom_admin.html"
@@ -113,7 +113,7 @@ class TestRegistration:
 
     def test_it_raises_when_not_subclassed(self):
         with pytest.raises(ImproperlyConfigured):
-            admin.site.register_view(NotInheretedView)
+            admin.site.register_view(NotInheritedView)
 
     def test_register_twice(self):
         with pytest.raises(admin.sites.AlreadyRegistered):
