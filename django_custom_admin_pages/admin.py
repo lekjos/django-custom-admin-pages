@@ -1,6 +1,6 @@
-import contextlib
 from collections import namedtuple
 from collections.abc import Iterable
+from functools import update_wrapper
 from typing import TYPE_CHECKING, List, Type, Union
 
 import django
@@ -9,11 +9,11 @@ from django.conf import settings
 from django.contrib import admin
 from django.contrib.admin.apps import AdminConfig
 from django.core.exceptions import ImproperlyConfigured
-from django.urls import NoReverseMatch, include, path, reverse
+from django.urls import NoReverseMatch, URLPattern, path, re_path, reverse
+from django.utils.text import get_valid_filename, slugify
 from django.views import View
 
 from django_custom_admin_pages.exceptions import CustomAdminImportException
-from django_custom_admin_pages.urls import add_view_to_conf
 
 if TYPE_CHECKING:
     from .views.admin_base_view import AdminBaseView
@@ -50,6 +50,60 @@ class CustomAdminSite(admin.AdminSite):
         self._view_registry: List["AdminBaseView"] = []
         super().__init__(*args, **kwargs)
 
+    def _make_admin_path(self, route, view, name, regex=False):
+        """permissions an admin view"""
+
+        def wrap(view, cacheable=False):
+            def wrapper(*args, **kwargs):
+                return self.admin_view(view, cacheable)(*args, **kwargs)
+
+            wrapper.admin_site = self
+            return update_wrapper(wrapper, view)
+
+        if regex:
+            path_func = re_path
+        else:
+            path_func = path
+
+        return path_func(
+            route,
+            wrap(view),
+            name=name,
+        )
+
+    def _build_view_path(self, view: "AdminBaseView"):
+        if not view.app_label:
+            view.app_label = settings.CUSTOM_ADMIN_DEFAULT_APP_LABEL
+        if not view.route_path:
+            view.route_path = slugify(view.view_name).lower()
+
+        if not view.route_name:
+            view.route_name = get_valid_filename(view.view_name).lower()
+
+        return self._make_admin_path(
+            f"{view.app_label}/{view.route_path}", view.as_view(), view.route_name
+        )
+
+    def _rebuild_app_list_path(
+        self, app_list_route: URLPattern, new_valid_app_labels: set
+    ):
+        """appends new app labels to app_list_route regex"""
+        original_regex: str = app_list_route.pattern.regex.pattern
+        prefix = "^(?P<app_label>"
+        suffix = ")/$"
+        if original_regex.startswith(prefix):
+            original_regex = original_regex[len(prefix) :]
+        if original_regex.endswith(suffix):
+            original_regex = original_regex[: -1 * len(suffix)]
+
+        original_app_labels = set(original_regex.split("|"))
+        app_labels = original_app_labels | new_valid_app_labels
+
+        new_regex = prefix + "|".join(app_labels) + suffix
+        return self._make_admin_path(
+            new_regex, self.app_index, name="app_list", regex=True
+        )
+
     def get_urls(self):
         """
         Adds registered view urls after adding to ModelAdmin urls.
@@ -57,20 +111,24 @@ class CustomAdminSite(admin.AdminSite):
         :return: url list
         :rtype: list[path]
         """
-        urls = super().get_urls()
-        with contextlib.suppress(ImportError):
-            from .urls import urlpatterns
 
-            if len(urlpatterns) > 0:
-                my_urls = [
-                    path(
-                        "",
-                        include("django_custom_admin_pages.urls"),
-                    )
-                ]
-                urls = my_urls + urls
+        urlpatterns = super().get_urls()
+        view_urls = []
+        catch_all_route = urlpatterns.pop(-1)
+        app_list_route = urlpatterns.pop(-1)
+        new_valid_app_labels = set()
+        for view in self._view_registry:
+            view_urls += [self._build_view_path(view)]
+            new_valid_app_labels.add(view.app_label)
 
-        return urls
+        if new_valid_app_labels:
+            app_list_route = self._rebuild_app_list_path(
+                app_list_route, new_valid_app_labels
+            )
+
+        urlpatterns += view_urls + [app_list_route, catch_all_route]
+
+        return urlpatterns
 
     def register_view(self, view_or_iterable: Union[Iterable, "AdminBaseView"]):
         """
@@ -119,8 +177,6 @@ class CustomAdminSite(admin.AdminSite):
                 )
 
             self._view_registry.append(view)
-
-            add_view_to_conf(view)
 
     def unregister_view(self, view_or_iterable: Union[Iterable, Type]):
         """
@@ -189,7 +245,14 @@ class CustomAdminSite(admin.AdminSite):
         app_list = super().get_app_list(request, **super_kwargs)
         custom_admin_models = []
 
-        for view in self._view_registry:
+        if app_label:
+            views = [
+                x for x in self._view_registry if get_app_label(x).lower() == app_label
+            ]
+        else:
+            views = self._view_registry
+
+        for view in views:
             found = False
             if not view().user_has_permission(request.user):
                 # skip if no permission
@@ -218,14 +281,15 @@ class CustomAdminSite(admin.AdminSite):
                 for app in remaining_apps:
                     if view_app_label == app:
                         found = True
-                        app_config = apps.get_app_config(view_app_label)
-                        app_name = app_config.verbose_name
+                        app_name = apps.get_app_config(view_app_label).verbose_name
                         # if app doesn't exist, create it and add model.
                         app_list.append(
                             {
                                 "name": app_name,
                                 "app_label": view_app_label,
-                                "app_url": f"{reverse(f'{self.name}:{view.route_name}')}{view_app_label}/",
+                                "app_url": reverse(
+                                    "admin:app_list", args=[view_app_label]
+                                ),
                                 "models": [self._build_modelview(view)],
                             }
                         )

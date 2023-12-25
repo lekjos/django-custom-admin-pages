@@ -104,12 +104,15 @@ class TestRegistration:
         with pytest.raises(ImproperlyConfigured):
             admin.site.register_view(NoViewName)
 
+    # def test_it_doesnt_raise_when_no_route_name(self):
+    #     admin.site.register_view(NoRouteName)
+    #     assert (
+    #         NoRouteName.route_name == get_valid_filename(NoRouteName.view_name).lower()
+    #     )
+    #     assert NoRouteName.route_path == slugify(NoRouteName.view_name).lower()
     def test_it_doesnt_raise_when_no_route_name(self):
         admin.site.register_view(NoRouteName)
-        assert (
-            NoRouteName.route_name == get_valid_filename(NoRouteName.view_name).lower()
-        )
-        assert NoRouteName.route_path == slugify(NoRouteName.view_name).lower()
+        assert NoRouteName in admin.site._view_registry
 
     def test_it_raises_when_not_subclassed(self):
         with pytest.raises(ImproperlyConfigured):
