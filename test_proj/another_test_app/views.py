@@ -25,3 +25,7 @@ class AnotherExampleAdminView(AdminBaseView, TemplateView):
 
 # register the view after you create it
 admin.site.register_view(AnotherExampleAdminView)
+
+
+class Home(TemplateView):
+    template_name = "home.html"
