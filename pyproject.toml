@@ -52,7 +52,7 @@ python = "^3.8"
 django = ">=3.2,<5.0"
 
 [tool.poetry.group.dev.dependencies]
-twine = "^4.0.2"
+twine = ">=4.0.2,<6.0.0"
 pytest-cov = "^4.1.0"
 pytest = "^7.4.2"
 tox = "^4.11.3"
