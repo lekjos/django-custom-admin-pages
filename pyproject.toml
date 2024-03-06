@@ -6,7 +6,7 @@ authors = [
 maintainers = [
     "Leif Kjos <leif+pypi@leifkjos.com>",
 ]
-version = "1.2.4"
+version = "1.2.5"
 description = "A django app that lets you add standard class-based views to the django admin index and navigation."
 license = "BSD-3-Clause"
 readme = "README.md"
@@ -21,6 +21,7 @@ classifiers = [
     "Framework :: Django :: 4.0", 
     "Framework :: Django :: 4.1", 
     "Framework :: Django :: 4.2", 
+    "Framework :: Django :: 5.0", 
     "Intended Audience :: Developers",
     "License :: OSI Approved :: BSD License",
     "Operating System :: OS Independent",
@@ -49,10 +50,10 @@ packages = [{include = "django_custom_admin_pages"}]
 
 [tool.poetry.dependencies]
 python = "^3.8"
-django = ">=3.2,<5.0"
+django = ">=3.2"
 
 [tool.poetry.group.dev.dependencies]
-twine = "^4.0.2"
+twine = "^5.0.0"
 pytest-cov = "^4.1.0"
 pytest = "^7.4.2"
 tox = "^4.11.3"
