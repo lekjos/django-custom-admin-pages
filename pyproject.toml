@@ -54,7 +54,7 @@ django = ">=3.2"
 
 [tool.poetry.group.dev.dependencies]
 twine = "^5.0.0"
-pytest-cov = "^4.1.0"
+pytest-cov = ">=4.1,<6.0"
 pytest = "^7.4.2"
 tox = "^4.11.3"
 black = "^23.9.1"
