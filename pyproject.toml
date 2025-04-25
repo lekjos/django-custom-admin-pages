@@ -6,7 +6,7 @@ authors = [
 maintainers = [
     "Leif Kjos <leif+pypi@leifkjos.com>",
 ]
-version = "1.2.5"
+version = "1.2.6"
 description = "A django app that lets you add standard class-based views to the django admin index and navigation."
 license = "BSD-3-Clause"
 readme = "README.md"
@@ -16,12 +16,14 @@ keywords = ["django", "admin", "django-admin", "django admin", "interface", "cus
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Environment :: Web Environment",
-    "Framework :: Django", 
+    "Framework :: Django",
     "Framework :: Django :: 3.2",
-    "Framework :: Django :: 4.0", 
-    "Framework :: Django :: 4.1", 
-    "Framework :: Django :: 4.2", 
-    "Framework :: Django :: 5.0", 
+    "Framework :: Django :: 4.0",
+    "Framework :: Django :: 4.1",
+    "Framework :: Django :: 4.2",
+    "Framework :: Django :: 5.0",
+    "Framework :: Django :: 5.1",
+    "Framework :: Django :: 5.2",
     "Intended Audience :: Developers",
     "License :: OSI Approved :: BSD License",
     "Operating System :: OS Independent",
@@ -32,7 +34,8 @@ classifiers = [
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
-    "Topic :: Software Development :: Libraries :: Python Modules", 
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development :: Libraries :: Python Modules",
     "Topic :: Software Development :: Libraries :: Application Frameworks",
 ]
 include = [
@@ -59,9 +62,9 @@ pytest = "^7.4.2"
 tox = "^4.11.3"
 black = "^23.9.1"
 pylint = "^2.17.5"
-pylint-django = "^2.5.3"
+pylint-django = "^2.6.1"
 isort = "^5.12.0"
-coverage = "^7.3.2"
+coverage = "^7.8.0"
 pytest-django = "^4.6"
 sphinx-rtd-theme = "^1.2.2"
 sphinx = ">=6,<8"
