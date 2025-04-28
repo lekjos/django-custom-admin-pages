@@ -1,4 +1,4 @@
-asgiref==3.7.2 ; python_version >= "3.9" and python_version < "4.0"
+asgiref==3.8.1 ; python_version >= "3.9" and python_version < "4.0"
 django==4.2.11 ; python_version >= "3.9" and python_version < "4.0"
 pytz==2023.3 ; python_version >= "3.9" and python_version < "4.0"
 sqlparse==0.4.4 ; python_version >= "3.9" and python_version < "4.0"
