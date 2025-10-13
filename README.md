@@ -70,7 +70,7 @@ admin.site.register_view(YourCustomView)
 Your template should extend `admin/base.html` or `base_custom_admin.html` template:
 ```html
 <!-- my_template.html -->
-{% extends 'base_custom_admin.html' with title="your page title" %} 
+{% extends 'base_custom_admin.html' with title="your page title" %}
 {% block content %}
 <h1>Hello World</h1>
 {% endblock %}
@@ -85,7 +85,7 @@ Be sure to import the files where your views are stored prior to loading your ro
 from django.contrib import admin
 
 # importing view before url_patterns ensures it's registered!
-from some_app.views import YourCustomView 
+from some_app.views import YourCustomView
 
 url_patterns = [
    path("admin/", admin.site.urls),
@@ -96,6 +96,9 @@ url_patterns = [
 ## Configurable Settings
 
 - `CUSTOM_ADMIN_DEFAULT_APP_LABEL`: set to override the default app_label (default: `django_custom_admin_pages`)
+
+# Supported Versions
+See `tox.ini` for list of python / django version which are tested for this project. For example, Python 3.10 is tested for Django 3.2 - 5.2.
 
 ## Contributing
 

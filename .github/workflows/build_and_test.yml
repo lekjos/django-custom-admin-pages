@@ -36,10 +36,10 @@ jobs:
   test:
     strategy:
       matrix:
-        python-version: ['3.10', '3.11', '3.12']
-        django: ['32', '40', '41', '42', '50', '51', '52']
+        python-version: ['3.11', '3.12']
+        django: ['40', '41', '42', '50', '51', '52']
         include:
-          # Python 3.8 with Django <4.2 only
+          # Python 3.8 & 3.9 with older Django versions only
           - python-version: '3.8'
             django: '32'
           - python-version: '3.8'
@@ -48,7 +48,6 @@ jobs:
             django: '41'
           - python-version: '3.8'
             django: '42'
-          # Python 3.9 with Django <4.2 only
           - python-version: '3.9'
             django: '32'
           - python-version: '3.9'
@@ -57,9 +56,22 @@ jobs:
             django: '41'
           - python-version: '3.9'
             django: '42'
-          # Python 3.13, 3.14 with Django >3.2 only
-          - python-version: '3.13'
+          # Python 3.10 with full range (including Django 3.2)
+          - python-version: '3.10'
+            django: '32'
+          - python-version: '3.10'
             django: '40'
+          - python-version: '3.10'
+            django: '41'
+          - python-version: '3.10'
+            django: '42'
+          - python-version: '3.10'
+            django: '50'
+          - python-version: '3.10'
+            django: '51'
+          - python-version: '3.10'
+            django: '52'
+          # Python 3.13 with newer Django versions
           - python-version: '3.13'
             django: '41'
           - python-version: '3.13'
@@ -70,16 +82,7 @@ jobs:
             django: '51'
           - python-version: '3.13'
             django: '52'
-          - python-version: '3.14'
-            django: '40'
-          - python-version: '3.14'
-            django: '41'
-          - python-version: '3.14'
-            django: '42'
-          - python-version: '3.14'
-            django: '50'
-          - python-version: '3.14'
-            django: '51'
+          # Python 3.14 with Django 5.2 only
           - python-version: '3.14'
             django: '52'
     runs-on: ubuntu-latest
