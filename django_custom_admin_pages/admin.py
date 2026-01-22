@@ -108,7 +108,7 @@ class CustomAdminSite(admin.AdminSite):
                 )
 
             if app_label := getattr(view, "app_label", None):
-                if not app_label in get_installed_apps():
+                if app_label not in apps.app_configs:
                     raise ImproperlyConfigured(
                         f"Your view {view.view_name} has an invalid app_label: {app_label}. App label must be in settings.INSTALLED_APPS"
                     )
